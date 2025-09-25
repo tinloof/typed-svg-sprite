@@ -1,0 +1,38 @@
+# Development files
+node_modules/
+dist/
+example/
+src/
+dev/
+*.log
+
+# Configuration files
+webpack.config.js
+tsconfig.json
+.eslintrc*
+.prettierrc*
+
+# Version control
+.git/
+.gitignore
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Testing
+coverage/
+.nyc_output/
+
+# Build artifacts
+*.tgz
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Lock files (let users manage their own)
+package-lock.json
+yarn.lock

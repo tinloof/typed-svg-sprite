@@ -1,0 +1,62 @@
+{
+  "name": "svg-sprite-webpack-loader",
+  "version": "1.0.0",
+  "description": "A webpack loader that creates SVG sprites from all SVG files in the project directory",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "prepare": "npm run build",
+    "dev": "npm run build && webpack serve --config dev/webpack.config.js",
+    "dev:build": "npm run build && webpack --config dev/webpack.config.js",
+    "dev:clean": "rimraf dev/dist dev/src/icon-types.ts",
+    "clean": "rimraf dist"
+  },
+  "files": [
+    "dist/",
+    "index.ts",
+    "tsconfig.json",
+    "README.md"
+  ],
+  "keywords": [
+    "webpack",
+    "loader",
+    "svg",
+    "sprite",
+    "icon",
+    "typescript"
+  ],
+  "author": "",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/your-username/svg-sprite-webpack-loader.git"
+  },
+  "bugs": {
+    "url": "https://github.com/your-username/svg-sprite-webpack-loader/issues"
+  },
+  "homepage": "https://github.com/your-username/svg-sprite-webpack-loader#readme",
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "dependencies": {
+    "cheerio": "^1.0.0-rc.12",
+    "glob": "^10.3.10"
+  },
+  "peerDependencies": {
+    "webpack": "^5.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "@types/cheerio": "^0.22.35",
+    "typescript": "^5.0.0",
+    "ts-loader": "^9.5.1",
+    "webpack": "^5.89.0",
+    "webpack-cli": "^5.1.4",
+    "webpack-dev-server": "^4.15.1",
+    "html-webpack-plugin": "^5.5.3",
+    "style-loader": "^3.3.3",
+    "css-loader": "^6.8.1",
+    "rimraf": "^5.0.5"
+  }
+}

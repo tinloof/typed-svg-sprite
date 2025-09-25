@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SVG Sprite Webpack Loader - Development</title>
+    <style>
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        margin: 0;
+        padding: 20px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        color: #333;
+      }
+
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        background: white;
+        border-radius: 12px;
+        padding: 30px;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+      }
+
+      h1 {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        text-align: center;
+        margin-bottom: 10px;
+        font-size: 2.5rem;
+      }
+
+      .subtitle {
+        text-align: center;
+        color: #666;
+        margin-bottom: 40px;
+        font-size: 1.1rem;
+      }
+
+      .debug-info {
+        background: #f8f9fa;
+        border-radius: 8px;
+        padding: 20px;
+        margin-bottom: 30px;
+        border-left: 4px solid #007bff;
+      }
+
+      .debug-info h3 {
+        margin-top: 0;
+        color: #007bff;
+      }
+
+      .icons-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 20px;
+        margin: 30px 0;
+      }
+
+      .icon-card {
+        background: #f8f9fa;
+        border-radius: 8px;
+        padding: 20px;
+        text-align: center;
+        border: 2px solid transparent;
+        transition: all 0.3s ease;
+      }
+
+      .icon-card:hover {
+        border-color: #667eea;
+        transform: translateY(-2px);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+      }
+
+      .icon {
+        width: 48px;
+        height: 48px;
+        stroke: #667eea;
+        margin-bottom: 10px;
+      }
+
+      .icon-label {
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 5px;
+      }
+
+      .icon-id {
+        font-family: "Courier New", monospace;
+        background: #e9ecef;
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 0.85rem;
+        color: #495057;
+      }
+
+      .code-section {
+        background: #1e1e1e;
+        color: #d4d4d4;
+        border-radius: 8px;
+        padding: 20px;
+        margin: 20px 0;
+        overflow-x: auto;
+      }
+
+      .code-section pre {
+        margin: 0;
+        font-family: "Courier New", monospace;
+      }
+
+      .status {
+        display: inline-block;
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: 600;
+      }
+
+      .status.success {
+        background: #d4edda;
+        color: #155724;
+      }
+
+      .status.info {
+        background: #cce7ff;
+        color: #004085;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>SVG Sprite Webpack Loader</h1>
+      <p class="subtitle">Development & Testing Environment</p>
+
+      <div class="debug-info">
+        <h3>🔧 Debug Information</h3>
+        <p>
+          <strong>Loader Status:</strong>
+          <span class="status info" id="loader-status">Loading...</span>
+        </p>
+        <p><strong>Icons Found:</strong> <span id="icons-count">-</span></p>
+        <p>
+          <strong>Types Generated:</strong>
+          <span class="status info" id="types-status">Checking...</span>
+        </p>
+      </div>
+
+      <div id="icons-container">
+        <div class="icons-grid" id="icons-grid">
+          <!-- Icons will be populated by JavaScript -->
+        </div>
+      </div>
+
+      <div class="debug-info">
+        <h3>📝 Generated Sprite Preview</h3>
+        <div class="code-section">
+          <pre id="sprite-preview">Loading sprite...</pre>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
