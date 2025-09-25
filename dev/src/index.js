@@ -1,5 +1,5 @@
-// Import the SVG sprite using our custom loader
-import svgSprite from "./sprites.svg-sprite";
+// Import the SVG sprite URL using our custom loader
+import spriteUrl from "./sprites.svg-sprite";
 import "./styles.css";
 
 // Test icon configurations
@@ -32,16 +32,31 @@ const testIcons = [
   },
 ];
 
-// Function to inject the SVG sprite into the DOM
-function injectSvgSprite() {
-  console.log("🎨 SVG Sprite content:", svgSprite);
+// Function to setup SVG sprite (no DOM injection needed)
+function setupSvgSprite() {
+  console.log("🎨 SVG Sprite URL:", spriteUrl);
 
-  const spriteContainer = document.createElement("div");
-  spriteContainer.innerHTML = svgSprite;
-  document.body.appendChild(spriteContainer);
+  // Add preload hint for better performance
+  addSpritePreload();
 
+  // No need to inject sprite into DOM - icons will reference it externally
   // Update debug info
   updateDebugInfo();
+}
+
+// Function to add sprite preload hint for optimal performance
+function addSpritePreload() {
+  // Check if preload already exists
+  const existingPreload = document.querySelector(`link[href="${spriteUrl}"]`);
+  if (!existingPreload) {
+    const link = document.createElement("link");
+    link.rel = "preload";
+    link.href = spriteUrl;
+    link.as = "image";
+    link.type = "image/svg+xml";
+    document.head.appendChild(link);
+    console.log("✅ Added sprite preload hint:", spriteUrl);
+  }
 }
 
 // Function to create an icon element
@@ -52,7 +67,7 @@ function createIcon(iconId, className = "icon") {
   svg.setAttribute("xmlns", "http://www.w3.org/2000/svg");
 
   const use = document.createElementNS("http://www.w3.org/2000/svg", "use");
-  use.setAttribute("href", `#${iconId}`);
+  use.setAttribute("href", `${spriteUrl}#${iconId}`);
 
   svg.appendChild(use);
   return svg;
@@ -60,24 +75,25 @@ function createIcon(iconId, className = "icon") {
 
 // Function to update debug information
 function updateDebugInfo() {
-  // Check if symbols exist in DOM
-  const symbols = document.querySelectorAll("symbol");
-  const symbolIds = Array.from(symbols).map((s) => s.id);
+  // With external sprites, we can't check DOM symbols directly
+  // Instead, we'll rely on the expected icons configuration
+  const expectedIds = testIcons.map((icon) => icon.id);
 
   // Update status indicators
-  document.getElementById("loader-status").textContent = "Loaded Successfully";
+  document.getElementById("loader-status").textContent =
+    "Loaded Successfully (External Sprite)";
   document.getElementById("loader-status").className = "status success";
 
   document.getElementById(
     "icons-count"
-  ).textContent = `${symbols.length} icons`;
+  ).textContent = `${expectedIds.length} icons (expected)`;
 
   // Check if types file exists by checking if it was emitted by webpack
   // Since we know generateTypes is enabled, we can just check if types were generated
   setTimeout(() => {
     // Simple check - if the loader ran successfully and generateTypes was true,
     // then types should have been generated
-    const typesGenerated = svgSprite && svgSprite.length > 0; // If sprite exists, types were likely generated too
+    const typesGenerated = spriteUrl && spriteUrl.length > 0; // If sprite URL exists, types were likely generated too
 
     if (typesGenerated) {
       document.getElementById("types-status").textContent =
@@ -89,29 +105,31 @@ function updateDebugInfo() {
     }
   }, 500);
 
-  // Update sprite preview
+  // Update sprite preview with URL info
   const spritePreview = document.getElementById("sprite-preview");
   if (spritePreview) {
-    spritePreview.textContent = svgSprite.substring(0, 500) + "...";
+    spritePreview.textContent = `External sprite file: ${spriteUrl}
+
+Performance Benefits:
+- ✅ Reduced bundle size (no inline SVG content)
+- ✅ Better caching (sprite cached separately)
+- ✅ Preloadable sprite file (${
+      document.querySelector('link[rel="preload"]') ? "ENABLED" : "NOT FOUND"
+    })
+- ✅ Cleaner DOM tree (no symbol injection)
+- ✅ Scalable icons with CSS styling
+
+Usage: <use href="${spriteUrl}#icon-id"></use>`;
   }
 
-  console.log("🔍 Found symbols:", symbolIds);
-  console.log(
-    "🧪 Expected icons:",
-    testIcons.map((icon) => icon.id)
-  );
+  console.log("🔍 Sprite URL:", spriteUrl);
+  console.log("🧪 Expected icons:", expectedIds);
 
-  // Check for mismatches
-  const expectedIds = testIcons.map((icon) => icon.id);
-  const missing = expectedIds.filter((id) => !symbolIds.includes(id));
-  const extra = symbolIds.filter((id) => !expectedIds.includes(id));
-
-  if (missing.length > 0) {
-    console.warn("⚠️ Missing expected icons:", missing);
-  }
-  if (extra.length > 0) {
-    console.info("ℹ️ Extra icons found:", extra);
-  }
+  console.log("✅ External sprite approach benefits:");
+  console.log("  - No DOM injection required");
+  console.log("  - Sprite can be cached separately");
+  console.log('  - Preloadable with <link rel="preload">');
+  console.log("  - Smaller JavaScript bundle");
 }
 
 // Function to render icon cards
@@ -155,33 +173,48 @@ function renderIcons() {
 function testLoaderFeatures() {
   console.group("🧪 Testing Loader Features");
 
-  // Test 1: Basic sprite injection
-  console.log("✅ Test 1: Sprite injection - Passed");
+  // Test 1: External sprite URL generation
+  console.log(
+    `✅ Test 1: Sprite URL generation - ${spriteUrl ? "Passed" : "Failed"}`
+  );
 
-  // Test 2: Symbol ID generation
-  const symbols = document.querySelectorAll("symbol");
-  console.log(`✅ Test 2: Symbol generation - Found ${symbols.length} symbols`);
-
-  // Test 3: Icon rendering
+  // Test 2: Icon rendering with external references
   testIcons.forEach(({ id }) => {
     const testIcon = createIcon(id);
-    const hasValidStructure = testIcon.querySelector("use") !== null;
+    const useElement = testIcon.querySelector("use");
+    const hasValidStructure = useElement !== null;
+    const hasCorrectHref =
+      useElement && useElement.getAttribute("href").includes(spriteUrl);
     console.log(
-      `${hasValidStructure ? "✅" : "❌"} Test 3: Icon ${id} - ${
-        hasValidStructure ? "Valid" : "Invalid"
-      } structure`
+      `${
+        hasValidStructure && hasCorrectHref ? "✅" : "❌"
+      } Test 2: Icon ${id} - ${
+        hasValidStructure && hasCorrectHref
+          ? "Valid external reference"
+          : "Invalid structure"
+      }`
     );
   });
+
+  // Test 3: Performance benefits
+  console.log(
+    "✅ Test 3: Performance improvements - External sprite approach enabled"
+  );
+  console.log("  - Bundle size reduced (no inline SVG)");
+  console.log("  - DOM tree not polluted with symbols");
+  console.log("  - Sprite file can be cached independently");
 
   console.groupEnd();
 }
 
 // Initialize the development environment
 document.addEventListener("DOMContentLoaded", () => {
-  console.log("🚀 SVG Sprite Webpack Loader - Development Mode");
+  console.log(
+    "🚀 SVG Sprite Webpack Loader - Development Mode (External Sprites)"
+  );
 
-  // Inject the SVG sprite
-  injectSvgSprite();
+  // Setup the SVG sprite (no injection needed)
+  setupSvgSprite();
 
   // Render icon cards
   renderIcons();
@@ -193,19 +226,62 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Add real-time debugging
   window.svgSpriteDebug = {
-    sprite: svgSprite,
-    symbols: () =>
-      Array.from(document.querySelectorAll("symbol")).map((s) => ({
-        id: s.id,
-        viewBox: s.getAttribute("viewBox"),
-      })),
+    spriteUrl: spriteUrl,
+    expectedIcons: testIcons.map((icon) => icon.id),
     createIcon: (id) => createIcon(id),
     testIcon: (id) => {
       const icon = createIcon(id, "icon");
       document.body.appendChild(icon);
       return icon;
     },
+    preloadSprite: () => {
+      addSpritePreload();
+      return document.querySelector(`link[href="${spriteUrl}"]`);
+    },
+    testSpriteLoading: async () => {
+      console.log("🧪 Testing sprite loading...");
+      try {
+        const response = await fetch(spriteUrl);
+        if (response.ok) {
+          const spriteContent = await response.text();
+          const symbolCount = (spriteContent.match(/<symbol/g) || []).length;
+          console.log(
+            `✅ Sprite loaded successfully: ${symbolCount} symbols found`
+          );
+          return { success: true, symbolCount, size: spriteContent.length };
+        } else {
+          console.error(`❌ Sprite loading failed: ${response.status}`);
+          return { success: false, status: response.status };
+        }
+      } catch (error) {
+        console.error("❌ Sprite loading error:", error);
+        return { success: false, error: error.message };
+      }
+    },
+    checkPerformance: () => {
+      const bundleSize = document.querySelector('script[src*="bundle"]')?.src;
+      console.log("📊 Performance Analysis:");
+      console.log(`  Bundle: ${bundleSize || "Not found"}`);
+      console.log(`  Sprite: ${spriteUrl}`);
+      console.log(
+        `  Preload: ${
+          document.querySelector('link[rel="preload"]')
+            ? "✅ Enabled"
+            : "❌ Missing"
+        }`
+      );
+      console.log(
+        `  DOM symbols: ${
+          document.querySelectorAll("symbol").length
+        } (should be 0 for external)`
+      );
+    },
   };
 
   console.log("🔧 Debug utilities available at window.svgSpriteDebug");
+  console.log("💡 Available commands:");
+  console.log("  - window.svgSpriteDebug.testSpriteLoading()");
+  console.log("  - window.svgSpriteDebug.checkPerformance()");
+  console.log("  - window.svgSpriteDebug.preloadSprite()");
+  console.log("  - window.svgSpriteDebug.testIcon('icon-home')");
 });

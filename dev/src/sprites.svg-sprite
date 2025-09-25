@@ -1,3 +1,2 @@
-// This file triggers the SVG sprite webpack loader
-// The loader will process all SVG files in dev/assets/icons/ and generate a sprite
-export default 'svg-sprite';
+// SVG Sprite - Automatically scans for SVG files and generates sprite
+export default "svg-sprite";

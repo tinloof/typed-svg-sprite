@@ -5,15 +5,11 @@ import * as cheerio from "cheerio";
 import type { LoaderContext } from "webpack";
 
 export interface SvgSpriteLoaderOptions {
-  srcDir?: string;
-  pattern?: string;
-  recursive?: boolean;
-  symbolPrefix?: string;
-  inline?: boolean;
-  className?: string;
-  generateTypes?: boolean;
-  typesOutputPath?: string;
-  typesFormat?: "enum" | "union" | "both";
+  src: string; // Source folder with SVGs
+  dist?: string; // Output folder (default: same as webpack output)
+  symbolPrefix?: string; // Symbol ID prefix (default: "icon-")
+  generateTypes?: boolean; // Generate TypeScript types (default: false)
+  typesOutput?: string; // Where to save types file (default: "src/sprite-types.ts")
 }
 
 interface SvgSymbol {
@@ -36,36 +32,28 @@ const svgSpriteLoader = function (
   // Get loader options (webpack 5 compatible)
   const options = this.getOptions() || {};
 
-  // Default options
-  const defaultOptions = {
-    // Directory to search for SVGs (relative to webpack context)
-    srcDir: options.srcDir || "src",
-    // File pattern to match SVG files
-    pattern: options.pattern || "**/*.svg",
-    // Whether to include subdirectories
-    recursive: options.recursive !== false,
-    // Prefix for symbol IDs
+  // Validate required options
+  if (!options.src) {
+    this.emitError(new Error('SVG Sprite Loader: "src" option is required'));
+    return 'module.exports = "";';
+  }
+
+  // Simple options
+  const config = {
+    src: options.src,
+    dist: options.dist || "", // Will use webpack output dir
     symbolPrefix: options.symbolPrefix || "icon-",
-    // Output sprite inline or as separate file
-    inline: options.inline !== false,
-    // Custom class name for the sprite container
-    className: options.className || "svg-sprite",
-    // Generate TypeScript definitions for icon IDs
     generateTypes: options.generateTypes || false,
-    // Output path for generated TypeScript file
-    typesOutputPath: options.typesOutputPath || "icon-types.ts",
-    // Format for generated types
-    typesFormat: options.typesFormat || "both",
+    typesOutput: options.typesOutput || "src/sprite-types.ts",
+    spriteFilename: "sprite.svg",
   };
 
   // Get the webpack context (project root)
   const context = this.rootContext || process.cwd();
 
-  // Build the search path
-  const searchDir = path.resolve(context, defaultOptions.srcDir);
-  const searchPattern = path
-    .join(searchDir, defaultOptions.pattern)
-    .replace(/\\/g, "/");
+  // Build the search path - automatically find all SVGs in src directory
+  const searchDir = path.resolve(context, config.src);
+  const searchPattern = path.join(searchDir, "**/*.svg").replace(/\\/g, "/");
 
   try {
     // Find all SVG files
@@ -82,64 +70,85 @@ const svgSpriteLoader = function (
     // Also watch the source directory for new files
     this.addContextDependency(searchDir);
 
-    // Additionally, watch all subdirectories that might contain SVG files
-    try {
-      const subdirPattern = path.join(searchDir, "*/").replace(/\\/g, "/");
-      const subdirs = glob.sync(subdirPattern, {
-        nodir: false,
-      });
-      subdirs.forEach((dir) => {
-        if (fs.statSync(dir).isDirectory()) {
-          this.addContextDependency(dir);
-        }
-      });
-    } catch (error) {
-      // Fallback: just watch the main directory
-      console.warn(
-        "SVG Sprite Loader: Could not setup subdirectory watching:",
-        error
-      );
-    }
-
     if (svgFiles.length === 0) {
       console.warn("SVG Sprite Loader: No SVG files found in", searchDir);
       return 'module.exports = "";';
     }
 
     // Create the SVG sprite
-    const { sprite, symbolIds } = createSvgSprite(
-      svgFiles,
-      defaultOptions,
-      context
-    );
+    const { sprite, symbolIds } = createSvgSprite(svgFiles, config, context);
 
     // Generate TypeScript types if requested
-    if (defaultOptions.generateTypes) {
-      const typesContent = generateTypesFile(symbolIds, defaultOptions);
-
-      // Write types file directly to filesystem using absolute path
-      const typesFilePath = path.resolve(
-        context,
-        defaultOptions.typesOutputPath
-      );
-      const typesDir = path.dirname(typesFilePath);
+    if (config.generateTypes) {
+      const typesContent = generateTypesFile(symbolIds);
+      const typesFilePath = path.resolve(context, config.typesOutput);
 
       // Ensure directory exists
+      const typesDir = path.dirname(typesFilePath);
       if (!fs.existsSync(typesDir)) {
         fs.mkdirSync(typesDir, { recursive: true });
       }
 
-      // Write the types file
-      fs.writeFileSync(typesFilePath, typesContent, "utf8");
+      // Only write the types file if it doesn't exist or content has changed
+      let shouldWrite = true;
+      if (fs.existsSync(typesFilePath)) {
+        const existingContent = fs.readFileSync(typesFilePath, "utf8");
+        shouldWrite = existingContent !== typesContent;
+      }
+
+      if (shouldWrite) {
+        fs.writeFileSync(typesFilePath, typesContent, "utf8");
+      }
     }
 
-    // Return the sprite as a module
-    if (defaultOptions.inline) {
-      return `module.exports = ${JSON.stringify(sprite)};`;
+    // Always emit as external file (no inline support)
+    const spriteBuffer = Buffer.from(sprite, "utf8");
+
+    let spriteUrl: string;
+
+    if (config.dist) {
+      // Custom output directory specified
+      const outputDir = path.resolve(context, config.dist);
+      const spriteFilePath = path.join(outputDir, config.spriteFilename);
+
+      // Ensure output directory exists
+      if (!fs.existsSync(outputDir)) {
+        fs.mkdirSync(outputDir, { recursive: true });
+      }
+
+      // Only write sprite file if it doesn't exist or content has changed
+      let shouldWriteSprite = true;
+      if (fs.existsSync(spriteFilePath)) {
+        const existingSprite = fs.readFileSync(spriteFilePath, "utf8");
+        shouldWriteSprite = existingSprite !== sprite;
+      }
+
+      if (shouldWriteSprite) {
+        fs.writeFileSync(spriteFilePath, sprite, "utf8");
+      }
+
+      // For custom dist directories, use the directory name as the public path
+      const distDirName = path.basename(config.dist);
+      spriteUrl = `/${distDirName}/${config.spriteFilename}`;
     } else {
-      // For future enhancement: emit as separate file
-      return `module.exports = ${JSON.stringify(sprite)};`;
+      // Use webpack's default output directory
+      this.emitFile(config.spriteFilename, spriteBuffer);
+
+      // Get the public path for the sprite file
+      const publicPathOption =
+        this._compilation?.outputOptions?.publicPath || "";
+      const publicPath =
+        typeof publicPathOption === "string" ? publicPathOption : "";
+
+      // Build sprite URL
+      spriteUrl = publicPath.endsWith("/")
+        ? publicPath + config.spriteFilename
+        : publicPath
+        ? publicPath + "/" + config.spriteFilename
+        : config.spriteFilename;
     }
+
+    return `module.exports = ${JSON.stringify(spriteUrl)};`;
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
     this.emitError(new Error(`SVG Sprite Loader Error: ${errorMessage}`));
@@ -152,7 +161,7 @@ const svgSpriteLoader = function (
  */
 function createSvgSprite(
   svgFiles: string[],
-  options: Required<SvgSpriteLoaderOptions>,
+  config: { src: string; symbolPrefix: string },
   context: string
 ): { sprite: string; symbolIds: string[] } {
   const symbols: SvgSymbol[] = [];
@@ -179,8 +188,8 @@ function createSvgSprite(
       const relativePath = path.relative(context, filePath);
       const symbolId = generateSymbolId(
         relativePath,
-        options.symbolPrefix,
-        options.srcDir
+        config.symbolPrefix,
+        config.src
       );
 
       // Get the viewBox or calculate it from width/height
@@ -211,7 +220,7 @@ function createSvgSprite(
   });
 
   // Generate the final sprite SVG
-  const sprite = generateSpriteSvg(symbols, options);
+  const sprite = generateSpriteSvg(symbols);
 
   return { sprite, symbolIds };
 }
@@ -252,10 +261,7 @@ function generateSymbolId(
 /**
  * Generates the final sprite SVG
  */
-function generateSpriteSvg(
-  symbols: SvgSymbol[],
-  options: Required<SvgSpriteLoaderOptions>
-): string {
+function generateSpriteSvg(symbols: SvgSymbol[]): string {
   if (symbols.length === 0) {
     return "";
   }
@@ -266,97 +272,41 @@ function generateSpriteSvg(
     })
     .join("\n  ");
 
-  const sprite = `<svg xmlns="http://www.w3.org/2000/svg" class="${options.className}" style="display: none;">
+  return `<svg xmlns="http://www.w3.org/2000/svg" class="svg-sprite" style="display: none;">
   ${symbolElements}
 </svg>`;
-
-  return sprite;
 }
 
 /**
  * Generates TypeScript definitions for icon IDs
  */
-function generateTypesFile(
-  symbolIds: string[],
-  options: Required<SvgSpriteLoaderOptions>
-): string {
-  const enumName = "IconId";
-  const typeName = "IconIdType";
-
+function generateTypesFile(symbolIds: string[]): string {
   let content = `// Auto-generated by svg-sprite-webpack-loader
 // Do not edit this file manually
 
-`;
-
-  if (options.typesFormat === "enum" || options.typesFormat === "both") {
-    // Generate enum
-    content += `/**
- * Enum containing all available icon IDs
- */
-export enum ${enumName} {
-`;
-
-    symbolIds.forEach((id) => {
-      // Convert kebab-case to PascalCase for enum keys
-      const enumKey = id
-        .split("-")
-        .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
-        .join("");
-
-      content += `  ${enumKey} = "${id}",\n`;
-    });
-
-    content += `}
-
-`;
-  }
-
-  if (options.typesFormat === "union" || options.typesFormat === "both") {
-    // Generate union type
-    content += `/**
+/**
  * Union type of all available icon IDs
  */
-export type ${typeName} = 
+export type IconId = 
 `;
 
-    symbolIds.forEach((id, index) => {
-      const isLast = index === symbolIds.length - 1;
-      content += `  | "${id}"${isLast ? ";" : ""}\n`;
-    });
+  symbolIds.forEach((id, index) => {
+    const isLast = index === symbolIds.length - 1;
+    content += `  | "${id}"${isLast ? ";" : ""}\n`;
+  });
 
-    content += `
-`;
-  }
+  content += `
 
-  // Add helper type for icon props
-  if (options.typesFormat === "both" || options.typesFormat === "union") {
-    const iconType =
-      options.typesFormat === "both" ? `${enumName} | ${typeName}` : typeName;
-    content += `/**
+/**
  * Props for icon components
  */
 export interface IconProps {
-  id: ${iconType};
+  id: IconId;
   className?: string;
   size?: number | string;
 }
 
-`;
-  } else {
-    content += `/**
- * Props for icon components
- */
-export interface IconProps {
-  id: ${enumName};
-  className?: string;
-  size?: number | string;
-}
-
-`;
-  }
-
-  // Add array of all icon IDs
-  content += `/**
+/**
  * Array of all available icon IDs
  */
 export const ALL_ICON_IDS = [
@@ -369,19 +319,10 @@ export const ALL_ICON_IDS = [
 
   content += `] as const;
 
-`;
-
-  // Add helper function
-  content += `/**
+/**
  * Type guard to check if a string is a valid icon ID
  */
-export function isValidIconId(id: string): id is ${
-    options.typesFormat === "both"
-      ? `${enumName} | ${typeName}`
-      : options.typesFormat === "enum"
-      ? enumName
-      : typeName
-  } {
+export function isValidIconId(id: string): id is IconId {
   return ALL_ICON_IDS.includes(id as any);
 }
 `;
@@ -398,11 +339,11 @@ export function getSymbolIds(
 ): string[] {
   const context = options.context || process.cwd();
   const symbolPrefix = options.symbolPrefix || "icon-";
-  const srcDir = options.srcDir || "src";
+  const src = options.src || "src";
 
   return svgFiles.map((filePath) => {
     const relativePath = path.relative(context, filePath);
-    return generateSymbolId(relativePath, symbolPrefix, srcDir);
+    return generateSymbolId(relativePath, symbolPrefix, src);
   });
 }
 

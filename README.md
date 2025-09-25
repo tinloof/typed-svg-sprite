@@ -1,16 +1,20 @@
 # SVG Sprite Webpack Loader
 
-A webpack loader that automatically creates SVG sprites from all SVG files in your project directory. This loader scans your project for SVG files, combines them into a single sprite, and makes it available as an importable module.
+A webpack loader that automatically creates SVG sprites from all SVG files in your project directory. This loader scans your project for SVG files, combines them into a single sprite file, and enables efficient external sprite referencing for optimal performance.
+
+**🚀 Now defaults to external sprite files** for better performance, following [best practices for SVG sprites in modern web applications](https://benadam.me/thoughts/react-svg-sprites/).
 
 ## Features
 
 - 🎯 **Automatic Discovery**: Finds all SVG files in your project automatically
-- 📦 **Single Sprite**: Combines all SVGs into one optimized sprite
+- 📦 **External Sprites**: Emits sprites as separate files for optimal caching and performance (default)
+- ⚡ **Performance Optimized**: Smaller bundles, better caching, preloadable sprites
 - 🔧 **Configurable**: Customizable search patterns, prefixes, and output options
 - ⚡ **Webpack Integration**: Seamlessly integrates with your webpack build process
 - 🔄 **Hot Reload**: Automatically updates when SVG files change
 - 📁 **Nested Support**: Handles SVGs in subdirectories
 - 📝 **TypeScript Support**: Full TypeScript definitions included
+- 🎨 **CSS Styleable**: Icons can be styled with CSS (color, size, etc.)
 
 ## Installation
 
@@ -48,10 +52,9 @@ module.exports = {
           {
             loader: "svg-sprite-webpack-loader",
             options: {
-              srcDir: "src", // Directory to search for SVGs
-              pattern: "**/*.svg", // File pattern to match
-              symbolPrefix: "icon-", // Prefix for symbol IDs
-              className: "svg-sprite", // CSS class for the sprite container
+              src: "src/icons", // Source folder with SVGs
+              symbolPrefix: "icon-", // Optional: prefix for symbol IDs
+              generateTypes: true, // Optional: generate TypeScript types
             },
           },
         ],
@@ -77,13 +80,9 @@ const config: Configuration = {
           {
             loader: "svg-sprite-webpack-loader",
             options: {
-              srcDir: "src/icons",
+              src: "src/icons",
               symbolPrefix: "icon-",
-              className: "svg-sprite",
-              // Generate TypeScript types for icon IDs
               generateTypes: true,
-              typesOutputPath: "icon-types.ts",
-              typesFormat: "both", // 'enum' | 'union' | 'both'
             } satisfies SvgSpriteLoaderOptions,
           },
         ],
@@ -95,57 +94,77 @@ const config: Configuration = {
 export default config;
 ```
 
-### 2. Create a Trigger File
+### 2. Create a Sprite Import
 
-Create a file with the `.svg-sprite` extension to trigger the loader:
+Create a simple file with `.svg-sprite` extension:
 
 ```javascript
 // sprites.svg-sprite
 export default "svg-sprite";
 ```
 
+This file acts as an entry point that tells the loader to scan for SVG files and generate the sprite.
+
 ### 3. Import and Use the Sprite
 
 ```javascript
 // In your JavaScript/TypeScript file
-import svgSprite from "./sprites.svg-sprite";
+import spriteUrl from "./sprites.svg-sprite";
 
-// Inject the sprite into your HTML
-document.body.innerHTML += svgSprite;
+// Create icons that reference the external sprite
+function Icon({ id, className = "icon", ...props }) {
+  const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+  svg.setAttribute("class", className);
+  svg.setAttribute("viewBox", "0 0 24 24");
+  Object.assign(svg, props);
 
-// Use icons in your HTML
-// <svg class="icon"><use xlink:href="#icon-home"></use></svg>
+  const use = document.createElementNS("http://www.w3.org/2000/svg", "use");
+  use.setAttribute("href", `${spriteUrl}#${id}`);
+
+  svg.appendChild(use);
+  return svg;
+}
+
+// Usage
+const homeIcon = Icon({ id: "icon-home" });
+document.body.appendChild(homeIcon);
 ```
 
 ### 4. Using Icons in HTML
 
-Once the sprite is injected, you can use any SVG icon:
+With external sprites, icons reference the sprite file directly:
 
 ```html
 <!-- For a file: src/icons/home.svg -->
 <svg class="icon">
-  <use xlink:href="#icon-home"></use>
+  <use href="/sprite.svg#icon-home"></use>
 </svg>
 
 <!-- For a nested file: src/icons/navigation/menu.svg -->
 <svg class="icon">
-  <use xlink:href="#icon-navigation-menu"></use>
+  <use href="/sprite.svg#icon-navigation-menu"></use>
 </svg>
+```
+
+### 5. Performance Optimization (Recommended)
+
+Add a preload hint to your HTML for better performance:
+
+```html
+<head>
+  <link rel="preload" href="/sprite.svg" as="image" type="image/svg+xml" />
+</head>
 ```
 
 ## Configuration Options
 
-| Option            | Type    | Default           | Description                                                     |
-| ----------------- | ------- | ----------------- | --------------------------------------------------------------- |
-| `srcDir`          | string  | `'src'`           | Directory to search for SVG files (relative to webpack context) |
-| `pattern`         | string  | `'**/*.svg'`      | Glob pattern to match SVG files                                 |
-| `recursive`       | boolean | `true`            | Whether to include subdirectories                               |
-| `symbolPrefix`    | string  | `'icon-'`         | Prefix for symbol IDs                                           |
-| `inline`          | boolean | `true`            | Whether to inline the sprite or emit as separate file           |
-| `className`       | string  | `'svg-sprite'`    | CSS class for the sprite container                              |
-| `generateTypes`   | boolean | `false`           | Generate TypeScript definitions for icon IDs                    |
-| `typesOutputPath` | string  | `'icon-types.ts'` | Output path for generated TypeScript file                       |
-| `typesFormat`     | string  | `'both'`          | Format for generated types: `'enum'`, `'union'`, or `'both'`    |
+| Option          | Type    | Required | Default                 | Description                                           |
+| --------------- | ------- | -------- | ----------------------- | ----------------------------------------------------- |
+| `src`           | string  | ✅       | -                       | Source folder containing SVG files                    |
+| `symbolPrefix`  | string  | ❌       | `'icon-'`               | Prefix for symbol IDs                                 |
+| `generateTypes` | boolean | ❌       | `false`                 | Generate TypeScript definitions for icon IDs          |
+| `typesOutput`   | string  | ❌       | `'src/sprite-types.ts'` | Where to save the generated types file                |
+| `dist`          | string  | ❌       | webpack output          | Custom output folder for sprite file (e.g., `public`) |
 
 ### Example Configuration
 
@@ -153,10 +172,11 @@ Once the sprite is injected, you can use any SVG icon:
 {
   loader: 'svg-sprite-webpack-loader',
   options: {
-    srcDir: 'assets/icons',
-    pattern: '**/*.svg',
-    symbolPrefix: 'my-icon-',
-    className: 'my-svg-sprite'
+    src: 'assets/icons',        // Required: where your SVGs are
+    dist: 'public',             // Optional: save sprite in public folder
+    symbolPrefix: 'my-icon-',   // Optional: custom prefix
+    generateTypes: true,        // Optional: generate TypeScript types
+    typesOutput: 'src/types/sprite-types.ts', // Optional: where to save types
   }
 }
 ```
@@ -388,18 +408,71 @@ This loader generates standard SVG sprites that work in all modern browsers. For
 
 ## Performance Benefits
 
-- **Reduced HTTP Requests**: All SVG icons are loaded in a single request
-- **Caching**: The sprite is cached by the browser
-- **Compression**: SVG sprites compress well with gzip
-- **Scalability**: Vector graphics scale perfectly at any size
+### External Sprites (Default) - Recommended ⚡
+
+- **Smaller JavaScript Bundles**: SVG content is not included in your JS bundle
+- **Better Caching**: Sprite file is cached separately and can be shared across pages
+- **Preloadable**: Can be preloaded for instant icon rendering
+- **Cleaner DOM**: No sprite injection into the DOM tree
+- **Reduced Memory Usage**: Lower DOM node count improves performance
+
+### Additional Benefits
+
+- **Single HTTP Request**: All SVG icons loaded in one request
+- **Perfect Scalability**: Vector graphics scale at any size
+- **CSS Styleable**: Icons can be styled with CSS (color, size, stroke, etc.)
+- **Excellent Compression**: SVG sprites compress well with gzip/brotli
+
+This approach follows [Ben Adam's recommendations for optimal SVG sprite performance](https://benadam.me/thoughts/react-svg-sprites/) in modern web applications.
+
+## Migration from Inline Sprites
+
+If you were using the previous version with inline sprites, here's how to migrate:
+
+### Before (Inline Sprites)
+
+```javascript
+import svgSprite from "./sprites.svg-sprite";
+// Sprite content was a string containing the full SVG
+document.body.innerHTML += svgSprite;
+```
+
+### After (External Sprites - Current Default)
+
+```javascript
+import spriteUrl from "./sprites.svg-sprite";
+// spriteUrl is now a string containing the path to the sprite file
+// No DOM injection needed - icons reference the external file
+function createIcon(id) {
+  const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+  const use = document.createElementNS("http://www.w3.org/2000/svg", "use");
+  use.setAttribute("href", `${spriteUrl}#${id}`);
+  svg.appendChild(use);
+  return svg;
+}
+```
+
+### Force Inline Mode (Not Recommended)
+
+If you need to use inline sprites for compatibility reasons:
+
+```javascript
+{
+  loader: 'svg-sprite-webpack-loader',
+  options: {
+    inline: true // Explicitly enable inline mode
+  }
+}
+```
 
 ## Troubleshooting
 
 ### Icons not displaying
 
-1. Ensure the sprite is injected into the DOM before using icons
+1. Ensure the sprite file is accessible at the expected URL
 2. Check that the symbol ID matches the file path structure
 3. Verify that SVG files are valid and contain proper viewBox attributes
+4. Add preload hint for better performance: `<link rel="preload" href="/sprite.svg" as="image">`
 
 ### Build errors
 

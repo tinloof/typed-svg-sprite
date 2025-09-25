@@ -1,0 +1,4 @@
+**/node_modules/**
+**/public/**
+**/sprite-types.ts
+**/sprite.svg
