@@ -1,2 +1,0 @@
-// SVG Sprite - Automatically scans for SVG files and generates sprite
-export default "svg-sprite";
