@@ -1,11 +1,9 @@
 export interface IconProps extends React.SVGProps<SVGSVGElement> {
-  /** The symbol ID returned from importing an SVG file */
+  /** The symbol ID returned from importing an SVG file (can be full href with path) */
   id: string;
   /** Size shorthand for width and height */
   size?: number | string;
 }
-
-const spriteUrl = "/sprite.svg";
 
 export function Icon({
   id,
@@ -17,6 +15,9 @@ export function Icon({
   fill = "currentColor",
   ...props
 }: IconProps) {
+  // If id contains #, it's already a full href, otherwise assume it's just the symbol id
+  const href = id.includes("#") ? id : `#${id}`;
+
   return (
     <svg
       className={className}
@@ -27,7 +28,7 @@ export function Icon({
       aria-hidden="true"
       {...props}
     >
-      <use href={`${spriteUrl}#${id}`} />
+      <use href={`/_next/${href}`} />
     </svg>
   );
 }

@@ -1,4 +1,5 @@
 import type { NextConfig } from "next";
+import path from "path";
 
 const nextConfig: NextConfig = {
   // Regular webpack configuration for all SVG files
@@ -8,8 +9,10 @@ const nextConfig: NextConfig = {
       test: /\.svg$/,
       use: [
         {
-          loader: "svg-sprite-webpack-loader",
-          // No options needed - fully automatic!
+          loader: path.resolve(__dirname, "../../dist/index.js"),
+          options: {
+            dist: "static/media/sprite.svg",
+          },
         },
       ],
     });
@@ -24,10 +27,13 @@ const nextConfig: NextConfig = {
       "*.svg": {
         loaders: [
           {
-            loader: "svg-sprite-webpack-loader",
-            options: {},
+            loader: path.resolve(__dirname, "../../dist/index.js"),
+            options: {
+              dist: "static/media/sprite.svg",
+            },
           },
         ],
+        as: "*.js",
       },
     },
   },

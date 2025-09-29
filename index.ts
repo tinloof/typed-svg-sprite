@@ -56,7 +56,10 @@ const svgSpriteLoader = function (
     updateSpriteFile(this, options);
 
     let dist = options.dist || SPRITE_FILENAME;
-    dist.startsWith("/") ? dist : `/${dist}`;
+    // Ensure path starts with "/" for proper URL construction
+    if (!dist.startsWith("/")) {
+      dist = `/${dist}`;
+    }
 
     const moduleHref = `${dist}#${symbolId}`;
     // Return the symbol ID

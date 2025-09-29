@@ -27,7 +27,7 @@ export default function RootLayout({
       <head>
         <link
           rel="preload"
-          href="/sprite.svg"
+          href="/_next/static/media/sprite.svg"
           as="image"
           type="image/svg+xml"
         />
