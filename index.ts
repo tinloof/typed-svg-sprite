@@ -1,7 +1,15 @@
-import * as fs from "fs";
 import * as path from "path";
 import * as cheerio from "cheerio";
 import type { LoaderContext } from "webpack";
+
+interface LoaderOptions {
+  /**
+   * Custom path/filename for the sprite file.
+   * Can be a relative path from the webpack output directory.
+   * Defaults to "sprite.svg"
+   */
+  dist?: string;
+}
 
 interface SvgSymbol {
   id: string;
@@ -19,11 +27,14 @@ const SPRITE_FILENAME = "sprite.svg";
  * Processes individual SVG imports and adds them to a shared sprite
  */
 const svgSpriteLoader = function (
-  this: LoaderContext<any>,
+  this: LoaderContext<LoaderOptions>,
   source: string
 ): string {
   // Mark this loader as cacheable
   this.cacheable && this.cacheable();
+
+  // Get loader options
+  const options = this.getOptions() || {};
 
   // Get the webpack context (project root)
   const context = this.rootContext || process.cwd();
@@ -42,10 +53,14 @@ const svgSpriteLoader = function (
     spriteRegistry.set(currentFilePath, svgSymbol);
 
     // Update the sprite file incrementally
-    updateSpriteFile(this);
+    updateSpriteFile(this, options);
 
+    let dist = options.dist || SPRITE_FILENAME;
+    dist.startsWith("/") ? dist : `/${dist}`;
+
+    const moduleHref = `${dist}#${symbolId}`;
     // Return the symbol ID
-    return `module.exports = ${JSON.stringify(symbolId)};`;
+    return `module.exports = ${JSON.stringify(moduleHref)};`;
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
     this.emitError(new Error(`SVG Sprite Loader Error: ${errorMessage}`));
@@ -122,14 +137,19 @@ function parseSvgFile(svgContent: string, symbolId: string): SvgSymbol {
 
 // Track sprite emission with timeout-based debouncing
 let spriteEmissionTimeout: NodeJS.Timeout | null = null;
-let lastLoaderContext: LoaderContext<any> | null = null;
+let lastLoaderContext: LoaderContext<LoaderOptions> | null = null;
+let lastOptions: LoaderOptions = {};
 
 /**
  * Updates the sprite file using a debounced approach
  */
-function updateSpriteFile(loaderContext: LoaderContext<any>): void {
-  // Store the latest loader context
+function updateSpriteFile(
+  loaderContext: LoaderContext<LoaderOptions>,
+  options: LoaderOptions
+): void {
+  // Store the latest loader context and options
   lastLoaderContext = loaderContext;
+  lastOptions = options;
 
   // Clear any pending emission
   if (spriteEmissionTimeout) {
@@ -144,13 +164,17 @@ function updateSpriteFile(loaderContext: LoaderContext<any>): void {
         const symbols = Array.from(spriteRegistry.values());
         const sprite = generateSpriteSvg(symbols);
 
+        // Determine sprite filename from options or use default
+        const spriteFilename = lastOptions.dist || SPRITE_FILENAME;
+
         // Emit sprite file using webpack
         const spriteBuffer = Buffer.from(sprite, "utf8");
-        lastLoaderContext.emitFile(SPRITE_FILENAME, spriteBuffer);
+        lastLoaderContext.emitFile(spriteFilename, spriteBuffer);
       }
     } finally {
       spriteEmissionTimeout = null;
       lastLoaderContext = null;
+      lastOptions = {};
     }
   }, 10); // Small delay to allow all SVGs to be processed
 }

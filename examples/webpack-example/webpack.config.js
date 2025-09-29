@@ -20,7 +20,10 @@ module.exports = {
         use: [
           {
             loader: path.resolve(__dirname, "../../dist/index.js"),
-            // Zero configuration - fully automatic!
+            options: {
+              // Optional: specify custom location for sprite file
+              dist: "sprite.svg",
+            },
           },
         ],
       },

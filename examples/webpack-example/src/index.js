@@ -8,26 +8,7 @@ import githubIcon from "../assets/icons/social/github.svg";
 import googleIcon from "../assets/icons/social/google.svg";
 import menuIcon from "../assets/icons/navigation/menu.svg";
 
-// Import the utility functions (you would install these as part of the package)
-// For demo purposes, let's create them inline
-async function detectSpriteUrl() {
-  const commonUrls = [
-    "/sprite.svg",
-    "/public/sprite.svg",
-    "/assets/sprite.svg",
-  ];
-
-  for (const url of commonUrls) {
-    try {
-      const response = await fetch(url, { method: "HEAD" });
-      if (response.ok) return url;
-    } catch {}
-  }
-  return "/sprite.svg"; // fallback - webpack output directory
-}
-
-async function createIcon(symbolId, className = "icon") {
-  const spriteUrl = await detectSpriteUrl();
+async function createIcon(iconHref, className = "icon") {
   const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
   svg.setAttribute("class", className);
   svg.setAttribute("viewBox", "0 0 24 24");
@@ -36,7 +17,7 @@ async function createIcon(symbolId, className = "icon") {
   svg.setAttribute("fill", "currentColor");
 
   const use = document.createElementNS("http://www.w3.org/2000/svg", "use");
-  use.setAttribute("href", `${spriteUrl}#${symbolId}`);
+  use.setAttribute("href", iconHref);
 
   svg.appendChild(use);
   return svg;
@@ -44,12 +25,12 @@ async function createIcon(symbolId, className = "icon") {
 
 // Demo icons with their imported symbol IDs
 const demoIcons = [
-  { id: homeIcon, name: "Home" },
-  { id: userIcon, name: "User" },
-  { id: settingsIcon, name: "Settings" },
-  { id: githubIcon, name: "GitHub" },
-  { id: googleIcon, name: "Google" },
-  { id: menuIcon, name: "Menu" },
+  { href: homeIcon, name: "Home" },
+  { href: userIcon, name: "User" },
+  { href: settingsIcon, name: "Settings" },
+  { href: githubIcon, name: "GitHub" },
+  { href: googleIcon, name: "Google" },
+  { href: menuIcon, name: "Menu" },
 ];
 
 // Render icons in a grid
@@ -65,18 +46,18 @@ async function renderIcons() {
     menuIcon,
   });
 
-  for (const { id, name } of demoIcons) {
+  for (const { href, name } of demoIcons) {
     const iconCard = document.createElement("div");
     iconCard.className = "icon-card";
 
-    const icon = await createIcon(id);
+    const icon = await createIcon(href);
     const nameDiv = document.createElement("div");
     nameDiv.className = "icon-name";
     nameDiv.textContent = name;
 
     const idDiv = document.createElement("div");
     idDiv.className = "icon-id";
-    idDiv.textContent = id;
+    idDiv.textContent = href;
 
     iconCard.appendChild(icon);
     iconCard.appendChild(nameDiv);
