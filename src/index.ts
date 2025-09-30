@@ -56,9 +56,9 @@ const svgSpriteLoader = function (
     updateSpriteFile(this, options);
 
     let dist = options.dist || SPRITE_FILENAME;
-    // Ensure path starts with "/" for proper URL construction
-    if (!dist.startsWith("/")) {
-      dist = `/${dist}`;
+    // remove the leading /
+    if (dist.startsWith("/")) {
+      dist = dist.slice(1);
     }
 
     const moduleHref = `${dist}#${symbolId}`;
@@ -161,6 +161,7 @@ function updateSpriteFile(
 
   // Set a new timeout to emit the sprite after all SVGs are processed
   spriteEmissionTimeout = setTimeout(() => {
+    console.log("Updating sprite file");
     try {
       if (lastLoaderContext) {
         // Generate sprite from current registry
@@ -174,12 +175,14 @@ function updateSpriteFile(
         const spriteBuffer = Buffer.from(sprite, "utf8");
         lastLoaderContext.emitFile(spriteFilename, spriteBuffer);
       }
+    } catch (error) {
+      console.error("Error updating sprite file:", error);
     } finally {
       spriteEmissionTimeout = null;
       lastLoaderContext = null;
       lastOptions = {};
     }
-  }, 10); // Small delay to allow all SVGs to be processed
+  }, 100); // Small delay to allow all SVGs to be processed
 }
 
 /**

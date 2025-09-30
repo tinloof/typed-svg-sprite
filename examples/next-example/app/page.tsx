@@ -1,101 +1,100 @@
-import { Icon } from "./components/Icon";
+import Link from "next/link";
 
-// Import SVG files directly - each returns its symbol ID
-import homeIcon from "../public/icons/home.svg";
-import settingsIcon from "../public/icons/settings.svg";
-import favoriteIcon from "../public/icons/favorite.svg";
-
-const demoIcons = [
-  { id: homeIcon, name: "Home", color: "text-blue-500" },
-  { id: settingsIcon, name: "Settings", color: "text-gray-600" },
-  { id: favoriteIcon, name: "Favorite", color: "text-pink-500" },
-];
-
-export default function Home() {
+export default function Sprite() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50 py-12">
-      <div className="max-w-6xl mx-auto px-6">
-        <header className="text-center mb-12">
-          <h1 className="text-4xl font-bold text-gray-900 mb-4">
-            SVG Sprite Webpack Loader
+      <header className="text-center mb-12">
+        <div className="bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent mb-4">
+          <h1 className="text-5xl font-extrabold mb-2">
+            🔥 EPIC ICON SHOWCASE 🔥
           </h1>
-          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            Next.js example demonstrating import-based SVG sprite generation
-            with zero configuration. Each SVG is imported directly and returns
-            its symbol ID.
-          </p>
-        </header>
-
-        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-6">
-          {demoIcons.map(({ id, name, color }) => (
-            <div
-              key={id}
-              className="bg-white rounded-lg p-6 shadow-md hover:shadow-lg transition-shadow duration-200 flex flex-col items-center text-center"
-            >
-              <Icon id={id} size={32} className={`${color} mb-3`} />
-              <h3 className="font-medium text-gray-900 mb-1">{name}</h3>
-              <code className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">
-                {id}
-              </code>
-            </div>
-          ))}
+          <h2 className="text-2xl font-bold">SVG Sprite Webpack Loader</h2>
         </div>
 
-        <footer className="mt-16 text-center">
-          <div className="bg-white rounded-lg p-6 shadow-md max-w-4xl mx-auto">
-            <h2 className="text-xl font-semibold text-gray-900 mb-4">
-              How it works
-            </h2>
-            <div className="text-left space-y-4 text-gray-700">
-              <div className="flex items-start gap-3">
-                <span className="flex-shrink-0 w-6 h-6 bg-blue-500 text-white rounded-full flex items-center justify-center text-sm font-bold">
-                  1
-                </span>
-                <p>
-                  <code className="bg-gray-100 px-2 py-1 rounded">
-                    import homeIcon from './home.svg'
-                  </code>{" "}
-                  - Import SVG files directly
-                </p>
-              </div>
-              <div className="flex items-start gap-3">
-                <span className="flex-shrink-0 w-6 h-6 bg-blue-500 text-white rounded-full flex items-center justify-center text-sm font-bold">
-                  2
-                </span>
-                <p>
-                  Each import returns a unique symbol ID (e.g.,{" "}
-                  <code className="bg-gray-100 px-2 py-1 rounded">
-                    "public-icons-home"
-                  </code>
-                  )
-                </p>
-              </div>
-              <div className="flex items-start gap-3">
-                <span className="flex-shrink-0 w-6 h-6 bg-blue-500 text-white rounded-full flex items-center justify-center text-sm font-bold">
-                  3
-                </span>
-                <p>
-                  All imported SVGs are automatically combined into{" "}
-                  <code className="bg-gray-100 px-2 py-1 rounded">
-                    /sprite.svg
-                  </code>
-                </p>
-              </div>
-              <div className="flex items-start gap-3">
-                <span className="flex-shrink-0 w-6 h-6 bg-blue-500 text-white rounded-full flex items-center justify-center text-sm font-bold">
-                  4
-                </span>
-                <p>
-                  <code className="bg-gray-100 px-2 py-1 rounded">
-                    &lt;Icon id={homeIcon} /&gt;
-                  </code>{" "}
-                  - Use the Icon component with auto-detection
-                </p>
-              </div>
+        <div className="flex justify-center items-center gap-6 mb-6">
+          <Link
+            className="px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors shadow-md hover:shadow-lg"
+            href="/sprite"
+          >
+            🎯 Sprite
+          </Link>
+          <Link
+            className="px-6 py-3 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700 transition-colors shadow-md hover:shadow-lg"
+            href="/image"
+          >
+            🖼️ Image
+          </Link>
+          <Link
+            className="px-6 py-3 bg-purple-600 text-white font-semibold rounded-lg hover:bg-purple-700 transition-colors shadow-md hover:shadow-lg"
+            href="/inline"
+          >
+            📝 Inline
+          </Link>
+        </div>
+
+        <p className="text-lg text-gray-600 max-w-3xl mx-auto">
+          🚀 <strong>EXTREME DEMO:</strong> Every single SVG icon manually
+          imported! Demonstrating import-based SVG sprite generation with zero
+          configuration. Each SVG returns its symbol ID for use with our sprite
+          loader.
+        </p>
+      </header>
+
+      <footer className="mt-16 text-center">
+        <div className="bg-white rounded-lg p-6 shadow-md max-w-4xl mx-auto">
+          <h2 className="text-xl font-semibold text-gray-900 mb-4">
+            How it works
+          </h2>
+          <div className="text-left space-y-4 text-gray-700">
+            <div className="flex items-start gap-3">
+              <span className="flex-shrink-0 w-6 h-6 bg-blue-500 text-white rounded-full flex items-center justify-center text-sm font-bold">
+                1
+              </span>
+              <p>
+                <code className="bg-gray-100 px-2 py-1 rounded">
+                  src="/icons/home.svg"
+                </code>{" "}
+                - Use direct paths to SVG files
+              </p>
+            </div>
+            <div className="flex items-start gap-3">
+              <span className="flex-shrink-0 w-6 h-6 bg-blue-500 text-white rounded-full flex items-center justify-center text-sm font-bold">
+                2
+              </span>
+              <p>
+                Images are served directly from the public folder (e.g.,{" "}
+                <code className="bg-gray-100 px-2 py-1 rounded">
+                  "/icons/home.svg"
+                </code>
+                )
+              </p>
+            </div>
+            <div className="flex items-start gap-3">
+              <span className="flex-shrink-0 w-6 h-6 bg-blue-500 text-white rounded-full flex items-center justify-center text-sm font-bold">
+                3
+              </span>
+              <p>
+                Each SVG is loaded individually as an image{" "}
+                <code className="bg-gray-100 px-2 py-1 rounded">
+                  &lt;img&gt;
+                </code>{" "}
+                element
+              </p>
+            </div>
+            <div className="flex items-start gap-3">
+              <span className="flex-shrink-0 w-6 h-6 bg-blue-500 text-white rounded-full flex items-center justify-center text-sm font-bold">
+                4
+              </span>
+              <p>
+                <code className="bg-gray-100 px-2 py-1 rounded">
+                  &lt;img src="/icons/home.svg" alt="Home" /&gt;
+                </code>{" "}
+                - Display SVGs as regular images
+              </p>
             </div>
           </div>
-        </footer>
-      </div>
+        </div>
+      </footer>
     </div>
   );
 }
