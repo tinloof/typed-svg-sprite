@@ -15,7 +15,7 @@
     }
   },
   "scripts": {
-    "build": "npx tsc",
+    "build": "tsc",
     "prepare": "npm run build",
     "dev": "npm run build && webpack serve --config examples/webpack-example/webpack.config.js",
     "dev:build": "npm run build && webpack --config examples/webpack-example/webpack.config.js",
