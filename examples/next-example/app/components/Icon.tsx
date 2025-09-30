@@ -28,7 +28,7 @@ export function Icon({
       aria-hidden="true"
       {...props}
     >
-      <use href={`/_next/${href}`} />
+      <use href={`/_next${href}`} />
     </svg>
   );
 }
