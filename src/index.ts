@@ -1,30 +1,43 @@
 import * as path from "path";
-import * as cheerio from "cheerio";
 import type { LoaderContext } from "webpack";
 
 interface LoaderOptions {
   /**
-   * Custom path/filename for the sprite file.
-   * Can be a relative path from the webpack output directory.
-   * Defaults to "sprite.svg"
+   * URL path where the sprite file will be served from.
+   * This is the base URL that will be prepended to the sprite filename.
    */
-  dist?: string;
-}
+  url: string;
 
-interface SvgSymbol {
-  id: string;
-  viewBox: string;
-  content: string;
-  attributes: Record<string, string>;
-}
+  /**
+   * Filename for the sprite file.
+   * @default "sprite.svg"
+   */
+  filename?: string;
 
-// Global sprite registry to track imported SVGs
-const spriteRegistry = new Map<string, SvgSymbol>();
-const SPRITE_FILENAME = "sprite.svg";
+  /**
+   * Directory containing SVG files (relative to project root).
+   * Used to generate symbol IDs consistently with the sprite generator.
+   * If not provided, uses the project root.
+   * @default undefined
+   */
+  inputDir?: string;
+}
 
 /**
  * SVG Sprite Webpack Loader
- * Processes individual SVG imports and adds them to a shared sprite
+ *
+ * Transforms SVG imports into sprite symbol references.
+ *
+ * Note: This loader only generates symbol references.
+ * You must generate the actual sprite file separately using the CLI tool:
+ * `svg-sprite-generate --input <icons-dir> --output <sprite-path>`
+ *
+ * @example
+ * // Input
+ * import homeIcon from './icons/home.svg';
+ *
+ * // Output
+ * const homeIcon = '/sprite.svg#icons-home';
  */
 const svgSpriteLoader = function (
   this: LoaderContext<LoaderOptions>,
@@ -36,6 +49,14 @@ const svgSpriteLoader = function (
   // Get loader options
   const options = this.getOptions() || {};
 
+  // Validate required options
+  if (!options.url) {
+    this.emitError(
+      new Error("SVG Sprite Loader Error: 'url' option is required.")
+    );
+    return `module.exports = "";`;
+  }
+
   // Get the webpack context (project root)
   const context = this.rootContext || process.cwd();
 
@@ -43,27 +64,25 @@ const svgSpriteLoader = function (
   const currentFilePath = this.resourcePath;
 
   try {
-    // Generate symbol ID from file path
-    const symbolId = generateSymbolIdFromPath(currentFilePath, context);
-
-    // Parse the current SVG file
-    const svgSymbol = parseSvgFile(source, symbolId);
-
-    // Add/update symbol in registry
-    spriteRegistry.set(currentFilePath, svgSymbol);
-
-    // Update the sprite file incrementally
-    updateSpriteFile(this, options);
-
-    let dist = options.dist || SPRITE_FILENAME;
-    // remove the leading /
-    if (dist.startsWith("/")) {
-      dist = dist.slice(1);
+    // Determine the base directory for generating symbol IDs
+    let baseDir = context;
+    if (options.inputDir) {
+      // Use inputDir to generate IDs consistent with sprite generator
+      baseDir = path.resolve(context, options.inputDir);
     }
 
-    const moduleHref = `${dist}#${symbolId}`;
-    // Return the symbol ID
-    return `module.exports = ${JSON.stringify(moduleHref)};`;
+    // Generate symbol ID from file path
+    const symbolId = generateSymbolIdFromPath(currentFilePath, baseDir);
+
+    // Build the URL for the symbol reference
+    const spriteUrl = options.url.endsWith("/")
+      ? options.url
+      : `${options.url}/`;
+    const spriteFilename = options.filename || "sprite.svg";
+    const symbolReference = `${spriteUrl}${spriteFilename}#${symbolId}`;
+
+    // Return the symbol reference
+    return `module.exports = ${JSON.stringify(symbolReference)};`;
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
     this.emitError(new Error(`SVG Sprite Loader Error: ${errorMessage}`));
@@ -89,126 +108,6 @@ function generateSymbolIdFromPath(filePath: string, context: string): string {
     .replace(/^-+|-+$/g, ""); // Remove leading/trailing dashes
 
   return symbolId;
-}
-
-/**
- * Parses an SVG file content and creates a symbol
- */
-function parseSvgFile(svgContent: string, symbolId: string): SvgSymbol {
-  // Parse the SVG with cheerio
-  const $ = cheerio.load(svgContent, { xmlMode: true });
-  const $svg = $("svg").first();
-
-  if ($svg.length === 0) {
-    throw new Error("Invalid SVG content");
-  }
-
-  // Get the viewBox or calculate it from width/height
-  let viewBox = $svg.attr("viewBox");
-  if (!viewBox) {
-    const width = $svg.attr("width") || "24";
-    const height = $svg.attr("height") || "24";
-    viewBox = `0 0 ${width} ${height}`;
-  }
-
-  // Collect all SVG attributes (except those we handle separately)
-  const attributes: Record<string, string> = {};
-  const svgAttribs = $svg.get(0)?.attribs || {};
-
-  // Preserve important attributes, excluding some that don't make sense for symbols
-  const excludeAttribs = new Set([
-    "viewBox",
-    "width",
-    "height",
-    "xmlns",
-    "xmlns:xlink",
-  ]);
-
-  for (const [key, value] of Object.entries(svgAttribs)) {
-    if (!excludeAttribs.has(key) && value) {
-      attributes[key] = value;
-    }
-  }
-
-  return {
-    id: symbolId,
-    viewBox: viewBox,
-    content: $svg.html() || "",
-    attributes: attributes,
-  };
-}
-
-// Track sprite emission with timeout-based debouncing
-let spriteEmissionTimeout: NodeJS.Timeout | null = null;
-let lastLoaderContext: LoaderContext<LoaderOptions> | null = null;
-let lastOptions: LoaderOptions = {};
-
-/**
- * Updates the sprite file using a debounced approach
- */
-function updateSpriteFile(
-  loaderContext: LoaderContext<LoaderOptions>,
-  options: LoaderOptions
-): void {
-  // Store the latest loader context and options
-  lastLoaderContext = loaderContext;
-  lastOptions = options;
-
-  // Clear any pending emission
-  if (spriteEmissionTimeout) {
-    clearTimeout(spriteEmissionTimeout);
-  }
-
-  // Set a new timeout to emit the sprite after all SVGs are processed
-  spriteEmissionTimeout = setTimeout(() => {
-    console.log("Updating sprite file");
-    try {
-      if (lastLoaderContext) {
-        // Generate sprite from current registry
-        const symbols = Array.from(spriteRegistry.values());
-        const sprite = generateSpriteSvg(symbols);
-
-        // Determine sprite filename from options or use default
-        const spriteFilename = lastOptions.dist || SPRITE_FILENAME;
-
-        // Emit sprite file using webpack
-        const spriteBuffer = Buffer.from(sprite, "utf8");
-        lastLoaderContext.emitFile(spriteFilename, spriteBuffer);
-      }
-    } catch (error) {
-      console.error("Error updating sprite file:", error);
-    } finally {
-      spriteEmissionTimeout = null;
-      lastLoaderContext = null;
-      lastOptions = {};
-    }
-  }, 100); // Small delay to allow all SVGs to be processed
-}
-
-/**
- * Generates the final sprite SVG
- */
-function generateSpriteSvg(symbols: SvgSymbol[]): string {
-  if (symbols.length === 0) {
-    return `<svg xmlns="http://www.w3.org/2000/svg" class="svg-sprite" style="display: none;">
-</svg>`;
-  }
-
-  const symbolElements = symbols
-    .map((symbol) => {
-      // Build attributes string
-      let attributesStr = "";
-      for (const [key, value] of Object.entries(symbol.attributes)) {
-        attributesStr += ` ${key}="${value}"`;
-      }
-
-      return `<symbol id="${symbol.id}" viewBox="${symbol.viewBox}"${attributesStr}>${symbol.content}</symbol>`;
-    })
-    .join("\n  ");
-
-  return `<svg xmlns="http://www.w3.org/2000/svg" class="svg-sprite" style="display: none;">
-  ${symbolElements}
-</svg>`;
 }
 
 export default svgSpriteLoader;

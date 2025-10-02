@@ -4,6 +4,9 @@
   "description": "A webpack loader that creates SVG sprites from all SVG files in the project directory",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "bin": {
+    "svg-sprite-generate": "./dist/cli.js"
+  },
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
@@ -49,7 +52,8 @@
     "node": ">=14.0.0"
   },
   "dependencies": {
-    "cheerio": "^1.0.0-rc.12"
+    "cheerio": "^1.0.0-rc.12",
+    "glob": "^10.3.10"
   },
   "peerDependencies": {
     "webpack": "^5.0.0",

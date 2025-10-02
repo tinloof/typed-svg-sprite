@@ -1,12 +1,14 @@
+import { IconHref } from "@/generated/icons";
+
 export interface IconProps extends React.SVGProps<SVGSVGElement> {
-  /** The symbol ID returned from importing an SVG file (can be full href with path) */
-  id: string;
+  /** The icon href (import from generated/icons.ts) */
+  href: IconHref;
   /** Size shorthand for width and height */
   size?: number | string;
 }
 
 export function Icon({
-  id,
+  href,
   size = 24,
   width,
   height,
@@ -15,9 +17,6 @@ export function Icon({
   fill = "currentColor",
   ...props
 }: IconProps) {
-  // If id contains #, it's already a full href, otherwise assume it's just the symbol id
-  const href = id.includes("#") ? id : `#${id}`;
-
   return (
     <svg
       className={className}
@@ -28,7 +27,7 @@ export function Icon({
       aria-hidden="true"
       {...props}
     >
-      <use href={`/_next/${href}`} />
+      <use href={href} />
     </svg>
   );
 }

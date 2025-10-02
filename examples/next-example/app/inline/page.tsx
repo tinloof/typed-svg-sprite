@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import HomeIcon from "../../components/icons/Home";
 import HomeFilledIcon from "../../components/icons/HomeFilled";
 import SettingsIcon from "../../components/icons/Settings";
@@ -137,259 +139,155 @@ import DonutSmallIcon from "../../components/icons/DonutSmall";
 import AddchartIcon from "../../components/icons/Addchart";
 
 // COMPREHENSIVE ICON SHOWCASE - ALL IMPORTED MANUALLY! 🔥
-const iconCategories = [
-  {
-    name: "🏠 Navigation & Core",
-    color: "text-blue-600",
-    bgColor: "bg-blue-50",
-    borderColor: "border-blue-200",
-    icons: [
-      { icon: HomeIcon, name: "Home" },
-      { icon: HomeFilledIcon, name: "Home Filled" },
-      { icon: SettingsIcon, name: "Settings" },
-      { icon: DashboardIcon, name: "Dashboard" },
-      { icon: MenuIcon, name: "Menu" },
-      { icon: SearchIcon, name: "Search" },
-      { icon: SearchOffIcon, name: "Search Off" },
-    ],
-  },
-  {
-    name: "⚡ Actions & Controls",
-    color: "text-green-600",
-    bgColor: "bg-green-50",
-    borderColor: "border-green-200",
-    icons: [
-      { icon: AddTaskIcon, name: "Add Task" },
-      { icon: DeleteIcon, name: "Delete" },
-      { icon: DeleteForeverIcon, name: "Delete Forever" },
-      { icon: DeleteOutlineIcon, name: "Delete Outline" },
-      { icon: EditOffIcon, name: "Edit Off" },
-      { icon: DoneIcon, name: "Done" },
-      { icon: DoneAllIcon, name: "Done All" },
-      { icon: DoneOutlineIcon, name: "Done Outline" },
-      { icon: RemoveDoneIcon, name: "Remove Done" },
-    ],
-  },
-  {
-    name: "💖 Favorites & Social",
-    color: "text-pink-600",
-    bgColor: "bg-pink-50",
-    borderColor: "border-pink-200",
-    icons: [
-      { icon: FavoriteIcon, name: "Favorite" },
-      { icon: FavoriteBorderIcon, name: "Favorite Border" },
-      { icon: ThumbUpIcon, name: "Thumb Up" },
-      { icon: ThumbDownIcon, name: "Thumb Down" },
-      { icon: ThumbUpOffIcon, name: "Thumb Up Off" },
-      { icon: ThumbDownOffIcon, name: "Thumb Down Off" },
-      { icon: ThumbsUpDownIcon, name: "Thumbs Up Down" },
-      { icon: StarsIcon, name: "Stars" },
-      { icon: StarRateIcon, name: "Star Rate" },
-      { icon: GradeIcon, name: "Grade" },
-    ],
-  },
-  {
-    name: "💬 Communication",
-    color: "text-purple-600",
-    bgColor: "bg-purple-50",
-    borderColor: "border-purple-200",
-    icons: [
-      { icon: FeedbackIcon, name: "Feedback" },
-      { icon: QuestionAnswerIcon, name: "Question Answer" },
-      { icon: QuickReplyIcon, name: "Quick Reply" },
-      { icon: CommentBankIcon, name: "Comment Bank" },
-      { icon: AnnouncementIcon, name: "Announcement" },
-      { icon: ContactSupportIcon, name: "Contact Support" },
-      { icon: ContactPageIcon, name: "Contact Page" },
-    ],
-  },
-  {
-    name: "ℹ️ Information & Help",
-    color: "text-indigo-600",
-    bgColor: "bg-indigo-50",
-    borderColor: "border-indigo-200",
-    icons: [
-      { icon: InfoIcon, name: "Info" },
-      { icon: InfoOutlineIcon, name: "Info Outline" },
-      { icon: HelpIcon, name: "Help" },
-      { icon: HelpOutlineIcon, name: "Help Outline" },
-      { icon: HelpCenterIcon, name: "Help Center" },
-      { icon: SupportIcon, name: "Support" },
-    ],
-  },
-  {
-    name: "🔒 Security & Privacy",
-    color: "text-red-600",
-    bgColor: "bg-red-50",
-    borderColor: "border-red-200",
-    icons: [
-      { icon: LockIcon, name: "Lock" },
-      { icon: LockOpenIcon, name: "Lock Open" },
-      { icon: LockOutlineIcon, name: "Lock Outline" },
-      { icon: LockClockIcon, name: "Lock Clock" },
-      { icon: VerifiedIcon, name: "Verified" },
-      { icon: VerifiedUserIcon, name: "Verified User" },
-      { icon: FingerprintIcon, name: "Fingerprint" },
-      { icon: PrivacyTipIcon, name: "Privacy Tip" },
-      { icon: SecurityIcon, name: "Security" },
-    ],
-  },
-  {
-    name: "🛍️ Shopping & Commerce",
-    color: "text-orange-600",
-    bgColor: "bg-orange-50",
-    borderColor: "border-orange-200",
-    icons: [
-      { icon: ShoppingCartIcon, name: "Shopping Cart" },
-      { icon: ShoppingBasketIcon, name: "Shopping Basket" },
-      { icon: ShoppingBagIcon, name: "Shopping Bag" },
-      { icon: AddShoppingCartIcon, name: "Add Shopping Cart" },
-      { icon: RemoveShoppingCartIcon, name: "Remove Shopping Cart" },
-      { icon: StoreIcon, name: "Store" },
-      { icon: ShopIcon, name: "Shop" },
-      { icon: ShopTwoIcon, name: "Shop Two" },
-      { icon: PaymentIcon, name: "Payment" },
-      { icon: CreditCardIcon, name: "Credit Card" },
-      { icon: CardGiftcardIcon, name: "Gift Card" },
-      { icon: CardMembershipIcon, name: "Membership Card" },
-      { icon: CardTravelIcon, name: "Travel Card" },
-      { icon: RedeemIcon, name: "Redeem" },
-      { icon: LoyaltyIcon, name: "Loyalty" },
-    ],
-  },
-  {
-    name: "💰 Financial",
-    color: "text-emerald-600",
-    bgColor: "bg-emerald-50",
-    borderColor: "border-emerald-200",
-    icons: [
-      { icon: AccountBalanceIcon, name: "Account Balance" },
-      { icon: AccountBalanceWalletIcon, name: "Account Balance Wallet" },
-      { icon: EuroSymbolIcon, name: "Euro Symbol" },
-      { icon: ReceiptIcon, name: "Receipt" },
-      { icon: TollIcon, name: "Toll" },
-    ],
-  },
-  {
-    name: "📅 Calendar & Time",
-    color: "text-teal-600",
-    bgColor: "bg-teal-50",
-    borderColor: "border-teal-200",
-    icons: [
-      { icon: CalendarTodayIcon, name: "Calendar Today" },
-      { icon: CalendarViewDayIcon, name: "Calendar View Day" },
-      { icon: EventIcon, name: "Event" },
-      { icon: EventSeatIcon, name: "Event Seat" },
-      { icon: TodayIcon, name: "Today" },
-      { icon: DateRangeIcon, name: "Date Range" },
-      { icon: ScheduleIcon, name: "Schedule" },
-      { icon: ScheduleSendIcon, name: "Schedule Send" },
-      { icon: QueryBuilderIcon, name: "Query Builder" },
-      { icon: HistoryIcon, name: "History" },
-      { icon: HistoryToggleOffIcon, name: "History Toggle Off" },
-      { icon: WatchLaterIcon, name: "Watch Later" },
-      { icon: HourglassEmptyIcon, name: "Hourglass Empty" },
-      { icon: HourglassFullIcon, name: "Hourglass Full" },
-      { icon: HourglassDisabledIcon, name: "Hourglass Disabled" },
-      { icon: AlarmIcon, name: "Alarm" },
-      { icon: AlarmAddIcon, name: "Alarm Add" },
-      { icon: AlarmOnIcon, name: "Alarm On" },
-      { icon: AlarmOffIcon, name: "Alarm Off" },
-    ],
-  },
-  {
-    name: "📄 Documents & Files",
-    color: "text-slate-600",
-    bgColor: "bg-slate-50",
-    borderColor: "border-slate-200",
-    icons: [
-      { icon: DescriptionIcon, name: "Description" },
-      { icon: ArticleIcon, name: "Article" },
-      { icon: AssignmentIcon, name: "Assignment" },
-      { icon: AssignmentLateIcon, name: "Assignment Late" },
-      { icon: AssignmentReturnIcon, name: "Assignment Return" },
-      { icon: AssignmentReturnedIcon, name: "Assignment Returned" },
-      { icon: AssignmentTurnedInIcon, name: "Assignment Turned In" },
-      { icon: FilePresentIcon, name: "File Present" },
-      { icon: RequestPageIcon, name: "Request Page" },
-      { icon: NoteAddIcon, name: "Note Add" },
-      { icon: StickyNote2Icon, name: "Sticky Note 2" },
-      { icon: SubjectIcon, name: "Subject" },
-    ],
-  },
-  {
-    name: "📚 Books & Reading",
-    color: "text-amber-600",
-    bgColor: "bg-amber-50",
-    borderColor: "border-amber-200",
-    icons: [
-      { icon: BookIcon, name: "Book" },
-      { icon: BookOnlineIcon, name: "Book Online" },
-      { icon: BookmarksIcon, name: "Bookmarks" },
-      { icon: BookmarkIcon, name: "Bookmark" },
-      { icon: BookmarkBorderIcon, name: "Bookmark Border" },
-      { icon: ChromeReaderModeIcon, name: "Chrome Reader Mode" },
-    ],
-  },
-  {
-    name: "📊 Analytics & Charts",
-    color: "text-cyan-600",
-    bgColor: "bg-cyan-50",
-    borderColor: "border-cyan-200",
-    icons: [
-      { icon: AnalyticsIcon, name: "Analytics" },
-      { icon: AssessmentIcon, name: "Assessment" },
-      { icon: TimelineIcon, name: "Timeline" },
-      { icon: TrendingUpIcon, name: "Trending Up" },
-      { icon: TrendingDownIcon, name: "Trending Down" },
-      { icon: TrendingFlatIcon, name: "Trending Flat" },
-      { icon: LeaderboardIcon, name: "Leaderboard" },
-      { icon: DonutLargeIcon, name: "Donut Large" },
-      { icon: DonutSmallIcon, name: "Donut Small" },
-      { icon: AddchartIcon, name: "Add Chart" },
-    ],
-  },
+const iconComponents = [
+  // 🏠 Navigation & Core
+  HomeIcon,
+  HomeFilledIcon,
+  SettingsIcon,
+  DashboardIcon,
+  MenuIcon,
+  SearchIcon,
+  SearchOffIcon,
+
+  // ⚡ Actions & Controls
+  AddTaskIcon,
+  DeleteIcon,
+  DeleteForeverIcon,
+  DeleteOutlineIcon,
+  EditOffIcon,
+  DoneIcon,
+  DoneAllIcon,
+  DoneOutlineIcon,
+  RemoveDoneIcon,
+
+  // 💖 Favorites & Social
+  FavoriteIcon,
+  FavoriteBorderIcon,
+  ThumbUpIcon,
+  ThumbDownIcon,
+  ThumbUpOffIcon,
+  ThumbDownOffIcon,
+  ThumbsUpDownIcon,
+  StarsIcon,
+  StarRateIcon,
+  GradeIcon,
+
+  // 💬 Communication
+  FeedbackIcon,
+  QuestionAnswerIcon,
+  QuickReplyIcon,
+  CommentBankIcon,
+  AnnouncementIcon,
+  ContactSupportIcon,
+  ContactPageIcon,
+
+  // ℹ️ Information & Help
+  InfoIcon,
+  InfoOutlineIcon,
+  HelpIcon,
+  HelpOutlineIcon,
+  HelpCenterIcon,
+  SupportIcon,
+
+  // 🔒 Security & Privacy
+  LockIcon,
+  LockOpenIcon,
+  LockOutlineIcon,
+  LockClockIcon,
+  VerifiedIcon,
+  VerifiedUserIcon,
+  FingerprintIcon,
+  PrivacyTipIcon,
+  SecurityIcon,
+
+  // 🛍️ Shopping & Commerce
+  ShoppingCartIcon,
+  ShoppingBasketIcon,
+  ShoppingBagIcon,
+  AddShoppingCartIcon,
+  RemoveShoppingCartIcon,
+  StoreIcon,
+  ShopIcon,
+  ShopTwoIcon,
+  PaymentIcon,
+  CreditCardIcon,
+  CardGiftcardIcon,
+  CardMembershipIcon,
+  CardTravelIcon,
+  RedeemIcon,
+  LoyaltyIcon,
+
+  // 💰 Financial
+  AccountBalanceIcon,
+  AccountBalanceWalletIcon,
+  EuroSymbolIcon,
+  ReceiptIcon,
+  TollIcon,
+
+  // 📅 Calendar & Time
+  CalendarTodayIcon,
+  CalendarViewDayIcon,
+  EventIcon,
+  EventSeatIcon,
+  TodayIcon,
+  DateRangeIcon,
+  ScheduleIcon,
+  ScheduleSendIcon,
+  QueryBuilderIcon,
+  HistoryIcon,
+  HistoryToggleOffIcon,
+  WatchLaterIcon,
+  HourglassEmptyIcon,
+  HourglassFullIcon,
+  HourglassDisabledIcon,
+  AlarmIcon,
+  AlarmAddIcon,
+  AlarmOnIcon,
+  AlarmOffIcon,
+
+  // 📄 Documents & Files
+  DescriptionIcon,
+  ArticleIcon,
+  AssignmentIcon,
+  AssignmentLateIcon,
+  AssignmentReturnIcon,
+  AssignmentReturnedIcon,
+  AssignmentTurnedInIcon,
+  FilePresentIcon,
+  RequestPageIcon,
+  NoteAddIcon,
+  StickyNote2Icon,
+  SubjectIcon,
+
+  // 📚 Books & Reading
+  BookIcon,
+  BookOnlineIcon,
+  BookmarksIcon,
+  BookmarkIcon,
+  BookmarkBorderIcon,
+  ChromeReaderModeIcon,
+
+  // 📊 Analytics & Charts
+  AnalyticsIcon,
+  AssessmentIcon,
+  TimelineIcon,
+  TrendingUpIcon,
+  TrendingDownIcon,
+  TrendingFlatIcon,
+  LeaderboardIcon,
+  DonutLargeIcon,
+  DonutSmallIcon,
+  AddchartIcon,
 ];
 
-export default function Sprite() {
+export default function Inline() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50 py-12">
-      <div className="max-w-6xl mx-auto px-6 space-y-12">
-        {iconCategories.map((category) => (
-          <div
-            key={category.name}
-            className={`p-8 rounded-xl ${category.bgColor} border-2 ${category.borderColor}`}
-          >
-            <div className="flex items-center gap-3 mb-6">
-              <h2 className={`text-2xl font-bold ${category.color}`}>
-                {category.name}
-              </h2>
-              <span className="bg-white px-3 py-1 rounded-full text-sm font-medium text-gray-600">
-                {category.icons.length} icons
-              </span>
-            </div>
-
-            <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 xl:grid-cols-10 gap-4">
-              {category.icons.map(({ icon: Icon, name }) => (
-                <div
-                  key={name}
-                  className="group bg-white rounded-lg p-4 shadow-sm hover:shadow-md transition-all duration-200 flex flex-col items-center text-center border hover:border-gray-300"
-                >
-                  <Icon
-                    className={`${category.color} mb-2 group-hover:scale-110 transition-transform duration-200`}
-                  />
-                  <h3 className="text-xs font-medium text-gray-800 mb-1 leading-tight">
-                    {name}
-                  </h3>
-                  <code className="text-xs text-gray-500 bg-gray-100 px-1.5 py-0.5 rounded text-center break-all">
-                    {name}
-                  </code>
-                </div>
-              ))}
-            </div>
-          </div>
-        ))}
-      </div>
+    <div className="flex flex-wrap gap-4 p-8">
+      {new Array(200).fill(0).map((_, index) => {
+        const Icon =
+          iconComponents[Math.floor(Math.random() * iconComponents.length)];
+        return <Icon key={index} />;
+      })}
     </div>
   );
 }
