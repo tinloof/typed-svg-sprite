@@ -7,4 +7,4 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default withSpriteLoader(nextConfig);
+export default nextConfig;

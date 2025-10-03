@@ -193,7 +193,6 @@ function generateSprite(
     fs.mkdirSync(outputDir, { recursive: true });
     fs.writeFileSync(absoluteOutputFile, spriteContent, "utf8");
 
-    console.log("The env is", process.env.NODE_ENV);
     console.log(
       `[svg-sprite] ✅ Generated sprite with ${symbols.length} symbols → ${outputFile}`
     );
