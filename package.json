@@ -4,6 +4,9 @@
   "description": "A webpack loader that creates SVG sprites from all SVG files in the project directory",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "workspaces": [
+    "examples/*"
+  ],
   "bin": {
     "svg-sprite-generate": "./dist/cli.js"
   },
