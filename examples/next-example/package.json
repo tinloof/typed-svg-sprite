@@ -4,8 +4,8 @@
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
-    "build": "npm run build --prefix ../.. && next build --turbopack",
-    "build:next": "next build --turbopack",
+    "build": "npm run build --prefix ../.. && cross-env NODE_ENV=production next build --turbopack",
+    "build:next": "cross-env NODE_ENV=production next build --turbopack",
     "start": "next start",
     "lint": "biome check",
     "format": "biome format --write"
