@@ -33,70 +33,7 @@ export default function Sprite() {
             📝 Inline
           </Link>
         </div>
-
-        <p className="text-lg text-gray-600 max-w-3xl mx-auto">
-          🚀 <strong>EXTREME DEMO:</strong> Every single SVG icon manually
-          imported! Demonstrating import-based SVG sprite generation with zero
-          configuration. Each SVG returns its symbol ID for use with our sprite
-          loader.
-        </p>
       </header>
-
-      <footer className="mt-16 text-center">
-        <div className="bg-white rounded-lg p-6 shadow-md max-w-4xl mx-auto">
-          <h2 className="text-xl font-semibold text-gray-900 mb-4">
-            How it works
-          </h2>
-          <div className="text-left space-y-4 text-gray-700">
-            <div className="flex items-start gap-3">
-              <span className="flex-shrink-0 w-6 h-6 bg-blue-500 text-white rounded-full flex items-center justify-center text-sm font-bold">
-                1
-              </span>
-              <p>
-                <code className="bg-gray-100 px-2 py-1 rounded">
-                  src="/icons/home.svg"
-                </code>{" "}
-                - Use direct paths to SVG files
-              </p>
-            </div>
-            <div className="flex items-start gap-3">
-              <span className="flex-shrink-0 w-6 h-6 bg-blue-500 text-white rounded-full flex items-center justify-center text-sm font-bold">
-                2
-              </span>
-              <p>
-                Images are served directly from the public folder (e.g.,{" "}
-                <code className="bg-gray-100 px-2 py-1 rounded">
-                  "/icons/home.svg"
-                </code>
-                )
-              </p>
-            </div>
-            <div className="flex items-start gap-3">
-              <span className="flex-shrink-0 w-6 h-6 bg-blue-500 text-white rounded-full flex items-center justify-center text-sm font-bold">
-                3
-              </span>
-              <p>
-                Each SVG is loaded individually as an image{" "}
-                <code className="bg-gray-100 px-2 py-1 rounded">
-                  &lt;img&gt;
-                </code>{" "}
-                element
-              </p>
-            </div>
-            <div className="flex items-start gap-3">
-              <span className="flex-shrink-0 w-6 h-6 bg-blue-500 text-white rounded-full flex items-center justify-center text-sm font-bold">
-                4
-              </span>
-              <p>
-                <code className="bg-gray-100 px-2 py-1 rounded">
-                  &lt;img src="/icons/home.svg" alt="Home" /&gt;
-                </code>{" "}
-                - Display SVGs as regular images
-              </p>
-            </div>
-          </div>
-        </div>
-      </footer>
     </div>
   );
 }
