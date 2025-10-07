@@ -1,10 +1,6 @@
 import type { NextConfig } from "next";
 import { withSpriteLoader } from "svg-sprite-loader/next";
 
-const nextConfig: NextConfig = {
-  turbopack: {
-    root: __dirname,
-  },
-};
+const nextConfig: NextConfig = {};
 
 export default withSpriteLoader(nextConfig);

@@ -1,7 +1,7 @@
 import * as fs from "fs";
 import * as path from "path";
-import * as cheerio from "cheerio";
-import { globSync } from "glob";
+import { generateSprite } from "./core.js";
+import { generateTypesFile } from "./types.js";
 
 // Minimal Next.js config types we need
 interface NextConfig {
@@ -43,229 +43,40 @@ interface SpriteLoaderOptions {
   typesOutputFile?: string;
 }
 
-interface SvgSymbol {
-  id: string;
-  viewBox: string;
-  content: string;
-  attributes: Record<string, string>;
-}
-
 // Track if we've already started watching
 let watcherInitialized = false;
 
-function generateSymbolIdFromPath(filePath: string, baseDir: string): string {
-  const relativePath = path.relative(baseDir, filePath);
-  const pathWithoutExt = relativePath.replace(/\.svg$/, "");
-
-  const symbolId = pathWithoutExt
-    .replace(/[\/\\]/g, "-")
-    .replace(/[^a-zA-Z0-9-_]/g, "-")
-    .replace(/--+/g, "-")
-    .replace(/^-+|-+$/g, "");
-
-  return symbolId;
-}
-
-function parseSvgFile(svgContent: string, symbolId: string): SvgSymbol {
-  const $ = cheerio.load(svgContent, { xmlMode: true });
-  const $svg = $("svg").first();
-
-  if ($svg.length === 0) {
-    throw new Error("Invalid SVG content");
-  }
-
-  let viewBox = $svg.attr("viewBox");
-  if (!viewBox) {
-    const width = $svg.attr("width") || "24";
-    const height = $svg.attr("height") || "24";
-    viewBox = `0 0 ${width} ${height}`;
-  }
-
-  const attributes: Record<string, string> = {};
-  const svgAttribs = $svg.get(0)?.attribs || {};
-
-  const excludeAttribs = new Set([
-    "viewBox",
-    "width",
-    "height",
-    "xmlns",
-    "xmlns:xlink",
-  ]);
-
-  for (const [key, value] of Object.entries(svgAttribs)) {
-    if (!excludeAttribs.has(key) && value) {
-      attributes[key] = value;
-    }
-  }
-
-  return {
-    id: symbolId,
-    viewBox: viewBox,
-    content: $svg.html() || "",
-    attributes: attributes,
-  };
-}
-
-function generateSpriteSvg(
-  symbols: SvgSymbol[],
-  minify: boolean = true
-): string {
-  if (symbols.length === 0) {
-    return minify
-      ? '<svg xmlns="http://www.w3.org/2000/svg" style="display:none"></svg>'
-      : `<svg xmlns="http://www.w3.org/2000/svg" class="svg-sprite" style="display: none;">
-</svg>`;
-  }
-
-  const symbolElements = symbols
-    .map((symbol) => {
-      let attributesStr = "";
-      for (const [key, value] of Object.entries(symbol.attributes)) {
-        attributesStr += ` ${key}="${value}"`;
-      }
-
-      return `<symbol id="${symbol.id}" viewBox="${symbol.viewBox}"${attributesStr}>${symbol.content}</symbol>`;
-    })
-    .join(minify ? "" : "\n  ");
-
-  if (minify) {
-    return `<svg xmlns="http://www.w3.org/2000/svg" style="display:none">${symbolElements}</svg>`;
-  }
-
-  return `<svg xmlns="http://www.w3.org/2000/svg" class="svg-sprite" style="display: none;">
-  ${symbolElements}
-</svg>`;
-}
-
-function generateSprite(
+function generateSpriteAndTypes(
   inputDir: string,
   outputFile: string,
   spriteUrl: string,
   spriteFilename: string,
   typesOutputFile?: string
 ): void {
-  try {
-    const projectRoot = process.cwd();
-    const absoluteInputDir = path.resolve(projectRoot, inputDir);
-    const absoluteOutputFile = path.resolve(projectRoot, outputFile);
+  // Generate sprite and get symbols
+  const symbols = generateSprite({
+    inputDir,
+    outputFile,
+    verbose: false,
+    minify: true,
+  });
 
-    // Check if input directory exists
-    if (!fs.existsSync(absoluteInputDir)) {
-      console.warn(`[svg-sprite] Input directory not found: ${inputDir}`);
-      return;
-    }
-
-    // Find all SVG files
-    const svgFiles = globSync("**/*.svg", {
-      cwd: absoluteInputDir,
-      absolute: true,
-    });
-
-    if (svgFiles.length === 0) {
-      console.warn(`[svg-sprite] No SVG files found in ${inputDir}`);
-      return;
-    }
-
-    // Parse all SVG files
-    const symbols: SvgSymbol[] = [];
-    for (const svgFile of svgFiles) {
-      try {
-        const content = fs.readFileSync(svgFile, "utf8");
-        const symbolId = generateSymbolIdFromPath(svgFile, absoluteInputDir);
-        const symbol = parseSvgFile(content, symbolId);
-        symbols.push(symbol);
-      } catch (error) {
-        console.error(`[svg-sprite] Error parsing ${svgFile}:`, error);
-      }
-    }
-
-    // Generate sprite
-    const spriteContent = generateSpriteSvg(symbols);
-
-    // Write sprite file
-    const outputDir = path.dirname(absoluteOutputFile);
-    fs.mkdirSync(outputDir, { recursive: true });
-    fs.writeFileSync(absoluteOutputFile, spriteContent, "utf8");
-
+  // Log success with prefix
+  if (symbols.length > 0) {
     console.log(
       `[svg-sprite] ✅ Generated sprite with ${symbols.length} symbols → ${outputFile}`
     );
-
-    // Generate TypeScript types file if specified
-    if (typesOutputFile) {
-      generateTypesFile(symbols, spriteUrl, spriteFilename, typesOutputFile);
-    }
-  } catch (error) {
-    console.error("[svg-sprite] Error generating sprite:", error);
   }
-}
 
-function generateTypesFile(
-  symbols: SvgSymbol[],
-  spriteUrl: string,
-  spriteFilename: string,
-  outputFile: string
-): void {
-  try {
-    const projectRoot = process.cwd();
-    const absoluteOutputFile = path.resolve(projectRoot, outputFile);
-    const spriteUrlWithFilename = spriteUrl.endsWith("/")
-      ? `${spriteUrl}${spriteFilename}`
-      : `${spriteUrl}/${spriteFilename}`;
-
-    // Generate TypeScript content
-    const iconIds = symbols.map((s) => s.id);
-    const iconIdType = iconIds.map((id) => `  | "${id}"`).join("\n");
-    const iconExports = symbols
-      .map((s) => {
-        // Convert kebab-case to UPPER_SNAKE_CASE
-        const constantName = s.id.replace(/-/g, "_").toUpperCase();
-        return `export const ${constantName}: IconHref = "${spriteUrlWithFilename}#${s.id}";`;
-      })
-      .join("\n");
-
-    const content = `// Auto-generated by svg-sprite-loader
-// Do not edit this file manually
-
-/**
- * Available icon IDs in the sprite
- */
-export type IconId =
-${iconIdType};
-
-/**
- * Type-safe icon href (sprite URL + fragment identifier)
- */
-export type IconHref = \`${spriteUrlWithFilename}#\${IconId}\`;
-
-/**
- * Get the full sprite URL for an icon ID
- */
-export function getIconHref(iconId: IconId): IconHref {
-  return \`${spriteUrlWithFilename}#\${iconId}\` as IconHref;
-}
-
-/**
- * Pre-built icon references
- */
-${iconExports}
-
-/**
- * All available icons as an array
- */
-export const allIcons: IconId[] = [
-${iconIds.map((id) => `  "${id}",`).join("\n")}
-];
-`;
-
-    // Write types file
-    const outputDir = path.dirname(absoluteOutputFile);
-    fs.mkdirSync(outputDir, { recursive: true });
-    fs.writeFileSync(absoluteOutputFile, content, "utf8");
-
-    console.log(`[svg-sprite] ✅ Generated types file → ${outputFile}`);
-  } catch (error) {
-    console.error("[svg-sprite] Error generating types file:", error);
+  // Generate TypeScript types file if specified
+  if (typesOutputFile && symbols.length > 0) {
+    generateTypesFile({
+      symbols,
+      spriteUrl,
+      spriteFilename,
+      outputFile: typesOutputFile,
+      verbose: false,
+    });
   }
 }
 
@@ -291,9 +102,9 @@ function startWatcher(
   console.log(`[svg-sprite] 👀 Watching ${inputDir} for changes...`);
 
   fs.watch(absoluteInputDir, { recursive: true }, (eventType, filename) => {
-    if (filename && filename.endsWith(".svg")) {
+    if (filename?.endsWith(".svg")) {
       console.log(`[svg-sprite] Change detected: ${filename}`);
-      generateSprite(
+      generateSpriteAndTypes(
         inputDir,
         outputFile,
         spriteUrl,
@@ -368,7 +179,7 @@ export function withSpriteLoader(
   const typesOutputFile = options?.typesOutputFile ?? "generated/icons.ts";
 
   // Generate sprite and types on startup
-  generateSprite(
+  generateSpriteAndTypes(
     inputDir,
     outputFile,
     spriteUrl,
