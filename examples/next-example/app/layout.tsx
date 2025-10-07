@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "SVG Sprite Webpack Loader - Next.js Example",
+  title: "SVG Sprite Generator - Next.js Example",
   description: "Demonstrating SVG sprite generation with Next.js and Turbopack",
 };
 

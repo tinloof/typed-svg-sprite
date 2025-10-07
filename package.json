@@ -1,20 +1,14 @@
 {
-  "name": "svg-sprite-webpack-loader",
+  "name": "svg-sprite-loader",
   "version": "1.0.0",
-  "description": "A webpack loader that creates SVG sprites from all SVG files in the project directory",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
+  "description": "Generate SVG sprites with TypeScript support for Next.js and CLI",
   "workspaces": [
-    "examples/*"
+    "examples/next-example"
   ],
   "bin": {
     "svg-sprite-generate": "./dist/cli.js"
   },
   "exports": {
-    ".": {
-      "types": "./dist/index.d.ts",
-      "default": "./dist/index.js"
-    },
     "./next": {
       "types": "./dist/next.d.ts",
       "default": "./dist/next.js"
@@ -23,43 +17,36 @@
   "scripts": {
     "build": "tsc",
     "prepare": "npm run build",
-    "dev": "npm run build && webpack serve --config examples/webpack-example/webpack.config.js",
-    "dev:build": "npm run build && webpack --config examples/webpack-example/webpack.config.js",
-    "dev:clean": "rimraf examples/webpack-example/dist",
     "clean": "rimraf dist"
   },
   "files": [
     "dist/",
-    "types.d.ts",
     "README.md"
   ],
   "keywords": [
-    "webpack",
-    "loader",
     "svg",
     "sprite",
     "icon",
-    "typescript"
+    "typescript",
+    "nextjs",
+    "cli"
   ],
   "author": "",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/your-username/svg-sprite-webpack-loader.git"
+    "url": "https://github.com/your-username/svg-sprite-loader.git"
   },
   "bugs": {
-    "url": "https://github.com/your-username/svg-sprite-webpack-loader/issues"
+    "url": "https://github.com/your-username/svg-sprite-loader/issues"
   },
-  "homepage": "https://github.com/your-username/svg-sprite-webpack-loader#readme",
+  "homepage": "https://github.com/your-username/svg-sprite-loader#readme",
   "engines": {
     "node": ">=14.0.0"
   },
   "dependencies": {
     "cheerio": "^1.0.0-rc.12",
     "glob": "^10.3.10"
-  },
-  "peerDependencies": {
-    "webpack": "^5.0.0"
   },
   "peerDependenciesMeta": {
     "next": {
@@ -70,13 +57,6 @@
     "@types/node": "^20.0.0",
     "@types/cheerio": "^0.22.35",
     "typescript": "^5.0.0",
-    "ts-loader": "^9.5.1",
-    "webpack": "^5.89.0",
-    "webpack-cli": "^5.1.4",
-    "webpack-dev-server": "^5.2.2",
-    "html-webpack-plugin": "^5.5.3",
-    "style-loader": "^3.3.3",
-    "css-loader": "^6.8.1",
     "rimraf": "^5.0.5"
   }
 }
