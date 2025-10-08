@@ -57,16 +57,10 @@ function generateSpriteAndTypes(
   const symbols = generateSprite({
     inputDir,
     outputFile,
-    verbose: false,
+    verbose: true,
     minify: true,
+    optimize: true,
   });
-
-  // Log success with prefix
-  if (symbols.length > 0) {
-    console.log(
-      `[svg-sprite] ✅ Generated sprite with ${symbols.length} symbols → ${outputFile}`
-    );
-  }
 
   // Generate TypeScript types file if specified
   if (typesOutputFile && symbols.length > 0) {

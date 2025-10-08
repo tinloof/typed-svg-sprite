@@ -56,12 +56,17 @@ export function generateTypesFile(options: TypesGenerationOptions): void {
       : `${spriteUrl}/${spriteFilename}`;
 
     // Generate TypeScript content
-    const iconIds = symbols.map((s) => s.id);
-    const iconIdType = iconIds.map((id) => `  | "${id}"`).join("\n");
+    const enumEntries = symbols
+      .map((s) => {
+        // Convert kebab-case to UPPER_SNAKE_CASE for enum key (use originalId)
+        const enumKey = s.originalId.replace(/-/g, "_").toUpperCase();
+        // But reference the short ID in the value
+        return `  ${enumKey} = "${s.id}",`;
+      })
+      .join("\n");
     const iconExports = symbols
       .map((s) => {
-        // Convert kebab-case to UPPER_SNAKE_CASE
-        const constantName = s.id.replace(/-/g, "_").toUpperCase();
+        const constantName = s.originalId.replace(/-/g, "_").toUpperCase();
         return `export const ${constantName}: IconHref = "${spriteUrlWithFilename}#${s.id}";`;
       })
       .join("\n");
@@ -72,8 +77,9 @@ export function generateTypesFile(options: TypesGenerationOptions): void {
 /**
  * Available icon IDs in the sprite
  */
-export type IconId =
-${iconIdType};
+export enum IconId {
+${enumEntries}
+}
 
 /**
  * Type-safe icon href (sprite URL + fragment identifier)
@@ -96,7 +102,9 @@ ${iconExports}
  * All available icons as an array
  */
 export const allIcons: IconId[] = [
-${iconIds.map((id) => `  "${id}",`).join("\n")}
+${symbols
+  .map((s) => `  IconId.${s.originalId.replace(/-/g, "_").toUpperCase()},`)
+  .join("\n")}
 ];
 `;
 
