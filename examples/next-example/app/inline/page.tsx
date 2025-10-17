@@ -138,7 +138,6 @@ import DonutLargeIcon from "../../components/icons/DonutLarge";
 import DonutSmallIcon from "../../components/icons/DonutSmall";
 import AddchartIcon from "../../components/icons/Addchart";
 
-// COMPREHENSIVE ICON SHOWCASE - ALL IMPORTED MANUALLY! 🔥
 const iconComponents = [
   // 🏠 Navigation & Core
   HomeIcon,
@@ -282,12 +281,76 @@ const iconComponents = [
 
 export default function Inline() {
   return (
-    <div className="flex flex-wrap gap-4 p-8">
-      {new Array(200).fill(0).map((_, index) => {
-        const Icon =
-          iconComponents[Math.floor(Math.random() * iconComponents.length)];
-        return <Icon key={index} />;
-      })}
+    <div className="min-h-screen">
+      <div className="flex flex-wrap gap-4 p-8">
+        {new Array(200).fill(0).map((_, index) => {
+          const IconComponent =
+            iconComponents[Math.floor(Math.random() * iconComponents.length)];
+          return (
+            <IconComponent
+              key={`${IconComponent.name}-${Math.random()}-${index}`}
+            />
+          );
+        })}
+      </div>
+
+      {/* Pros and Cons Section */}
+      <div className="max-w-4xl mx-auto p-8">
+        <h2 className="text-2xl font-bold mb-4">📝 Inline SVG Components</h2>
+
+        <div className="grid md:grid-cols-2 gap-6 mb-6">
+          <div className="p-4 bg-green-50 rounded">
+            <h3 className="font-semibold text-green-800 mb-2">✓ Pros</h3>
+            <ul className="text-sm space-y-1">
+              <li>
+                • <strong>Tree-shakeable</strong> - Unused icons excluded from
+                bundle
+              </li>
+              <li>
+                • <strong>No external requests</strong> - Icons in JS bundle
+              </li>
+              <li>
+                • <strong>Type-safe</strong> - Import errors caught at build
+              </li>
+              <li>
+                • <strong>Fast initial render</strong> - No waiting for sprite
+              </li>
+              <li>
+                • <strong>Component props</strong> - Easy to customize per
+                instance
+              </li>
+            </ul>
+          </div>
+
+          <div className="p-4 bg-red-50 rounded">
+            <h3 className="font-semibold text-red-800 mb-2">✗ Cons</h3>
+            <ul className="text-sm space-y-1">
+              <li>
+                • <strong>Large DOM</strong> - Full SVG markup for each icon
+                (~15 nodes)
+              </li>
+              <li>
+                • <strong>Bigger JS bundle</strong> - ~500B per icon added to
+                bundle
+              </li>
+              <li>
+                • <strong>Not cached separately</strong> - Re-downloaded per
+                page
+              </li>
+              <li>
+                • <strong>Repeated content</strong> - Same icon = duplicate DOM
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <div className="p-4 bg-blue-50 rounded text-sm">
+          <strong>Best for:</strong> Small icon sets ({"<"}10 unique icons) or
+          critical above-the-fold icons. Look at the DOM - each icon has 10-15+
+          nodes. With 200 icons rendered, that's 2000+ DOM nodes! Compare this
+          to sprite which would only have 400 nodes (2 per icon).
+        </div>
+      </div>
     </div>
   );
 }

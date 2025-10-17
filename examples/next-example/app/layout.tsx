@@ -1,9 +1,11 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import SlideNavigation from "@/components/SlideNavigation";
 
 export const metadata: Metadata = {
-  title: "SVG Sprite Generator - Next.js Example",
-  description: "Demonstrating SVG sprite generation with Next.js and Turbopack",
+  title: "SVG Icon Optimization Demo",
+  description:
+    "Compare different SVG icon approaches: Sprite, Inline, and Image",
 };
 
 export default function RootLayout({
@@ -13,15 +15,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <head>
-        <link
-          rel="preload"
-          href="/sprite.svg"
-          as="image"
-          type="image/svg+xml"
-        />
-      </head>
-      <body className="antialiased">{children}</body>
+      <body>
+        {children}
+        <SlideNavigation />
+      </body>
     </html>
   );
 }

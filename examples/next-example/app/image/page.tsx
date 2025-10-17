@@ -143,11 +143,86 @@ const iconUrls = [
 
 export default function ImagePage() {
   return (
-    <div className="flex flex-wrap gap-4 p-8">
-      {new Array(200).fill(0).map((_, index) => {
-        const src = iconUrls[Math.floor(Math.random() * iconUrls.length)];
-        return <img key={index} src={src} alt="icon" width={24} height={24} />;
-      })}
+    <div className="min-h-screen">
+      <div className="flex flex-wrap gap-4 p-8">
+        {new Array(200).fill(0).map((_, index) => {
+          const src = iconUrls[Math.floor(Math.random() * iconUrls.length)];
+          return (
+            // biome-ignore lint: img is intentional for this demo
+            <img
+              key={`img-${Math.random()}-${index}`}
+              src={src}
+              alt="icon"
+              width={24}
+              height={24}
+            />
+          );
+        })}
+      </div>
+
+      {/* Pros and Cons Section */}
+      <div className="max-w-4xl mx-auto p-8">
+        <h2 className="text-2xl font-bold mb-4">🖼️ Individual Image Files</h2>
+
+        <div className="grid md:grid-cols-2 gap-6 mb-6">
+          <div className="p-4 bg-green-50 rounded">
+            <h3 className="font-semibold text-green-800 mb-2">✓ Pros</h3>
+            <ul className="text-sm space-y-1">
+              <li>
+                • <strong>Only load what you use</strong> - No unused icons
+              </li>
+              <li>
+                • <strong>Minimal DOM</strong> - Just &lt;img&gt; tags (1 node
+                each)
+              </li>
+              <li>
+                • <strong>Cacheable individually</strong> - Per-file browser
+                cache
+              </li>
+              <li>
+                • <strong>Easy to understand</strong> - Simple src attributes
+              </li>
+              <li>
+                • <strong>No build step</strong> - Direct file references
+              </li>
+            </ul>
+          </div>
+
+          <div className="p-4 bg-red-50 rounded">
+            <h3 className="font-semibold text-red-800 mb-2">✗ Cons</h3>
+            <ul className="text-sm space-y-1">
+              <li>
+                • <strong>Multiple HTTP requests</strong> - 200 requests on this
+                page!
+              </li>
+              <li>
+                • <strong>No CSS styling</strong> - Can't change colors with CSS
+              </li>
+              <li>
+                • <strong>Network waterfall</strong> - Icons load sequentially
+              </li>
+              <li>
+                • <strong>Cache overhead</strong> - Browser tracks each file
+                separately
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <div className="p-4 bg-blue-50 rounded text-sm">
+          <strong>Best for:</strong> Very simple use cases with few icons ({"<"}
+          5). Open DevTools Network tab - you'll see 200 HTTP requests for this
+          page! Even with HTTP/2, this creates more overhead than a single 25KB
+          sprite file.
+        </div>
+
+        <div className="mt-4 p-4 bg-yellow-50 rounded text-sm">
+          <strong>⚠️ Performance Impact:</strong> With 200 icons shown, that's
+          200 separate HTTP requests. Each request has overhead (DNS lookup,
+          connection, headers, etc). The sprite approach would be 1 request for
+          the same result.
+        </div>
+      </div>
     </div>
   );
 }

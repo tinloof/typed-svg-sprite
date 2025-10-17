@@ -1,5 +1,6 @@
 export const dynamic = "force-dynamic";
 
+import { PreloadSprite } from "@/components/PreloadSprite";
 import { Icon } from "../../components/Icon";
 
 import {
@@ -164,7 +165,6 @@ import {
   ADDCHART,
 } from "@/generated/icons";
 
-// COMPREHENSIVE ICON SHOWCASE - ALL IMPORTED MANUALLY! 🔥
 const iconHrefs = [
   // 🏠 Navigation & Core
   HOME,
@@ -308,13 +308,81 @@ const iconHrefs = [
 
 export default function Sprite() {
   return (
-    <div className="flex flex-wrap gap-4 p-8">
-      {new Array(200).fill(0).map((_, index) => (
-        <Icon
-          href={iconHrefs[Math.floor(Math.random() * iconHrefs.length)]}
-          key={index}
-        />
-      ))}
-    </div>
+    <>
+      <PreloadSprite />
+      <div className="min-h-screen">
+        <div className="flex flex-wrap gap-4 p-8">
+          {new Array(200).fill(0).map((_, index) => {
+            const randomHref =
+              iconHrefs[Math.floor(Math.random() * iconHrefs.length)];
+            return (
+              <Icon
+                href={randomHref}
+                key={`${randomHref}-${Math.random()}-${index}`}
+              />
+            );
+          })}
+        </div>
+
+        {/* Pros and Cons Section */}
+        <div className="max-w-4xl mx-auto p-8">
+          <h2 className="text-2xl font-bold mb-4">🎯 SVG Sprite Approach</h2>
+
+          <div className="grid md:grid-cols-2 gap-6 mb-6">
+            <div className="p-4 bg-green-50 rounded">
+              <h3 className="font-semibold text-green-800 mb-2">✓ Pros</h3>
+              <ul className="text-sm space-y-1">
+                <li>
+                  • <strong>Single HTTP request</strong> - One cached file for
+                  all icons
+                </li>
+                <li>
+                  • <strong>Minimal DOM</strong> - Tiny &lt;svg&gt;&lt;use&gt;
+                  references
+                </li>
+                <li>
+                  • <strong>Excellent compression</strong> - ~25-30KB compressed
+                </li>
+                <li>
+                  • <strong>Fast navigation</strong> - Icons cached across pages
+                </li>
+                <li>
+                  • <strong>CSS styling</strong> - Easy to customize colors
+                </li>
+              </ul>
+            </div>
+
+            <div className="p-4 bg-red-50 rounded">
+              <h3 className="font-semibold text-red-800 mb-2">✗ Cons</h3>
+              <ul className="text-sm space-y-1">
+                <li>
+                  • <strong>Unused icons included</strong> - All 115 icons in
+                  bundle
+                </li>
+                <li>
+                  • <strong>Not tree-shakeable</strong> - Can't auto-remove
+                  unused
+                </li>
+                <li>
+                  • <strong>Initial load overhead</strong> - Downloads all
+                  upfront
+                </li>
+                <li>
+                  • <strong>Build step required</strong> - Sprite generation
+                  needed
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          <div className="p-4 bg-blue-50 rounded text-sm">
+            <strong>Best for:</strong> Apps with 20+ icons across multiple
+            pages. The sprite (115 icons) is only 56KB uncompressed (~18-25KB
+            compressed). Once cached, navigation is instant with zero additional
+            downloads.
+          </div>
+        </div>
+      </div>
+    </>
   );
 }
