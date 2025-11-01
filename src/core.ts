@@ -79,12 +79,13 @@ export function generateSymbolIdFromPath(
  */
 function generateShortId(index: number): string {
   const chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+  const maxIndex = chars.length;
   let id = "";
   let num = index;
 
   do {
-    id = chars[num % 52] + id;
-    num = Math.floor(num / 52);
+    id = chars[num % maxIndex] + id;
+    num = Math.floor(num / maxIndex);
   } while (num > 0);
 
   return id;

@@ -2,6 +2,7 @@ import * as fs from "fs";
 import * as path from "path";
 import { generateSprite } from "./core.js";
 import { generateTypesFile } from "./types.js";
+import { generateIconComponent } from "./components.js";
 
 // Minimal Next.js config types we need
 interface NextConfig {
@@ -41,6 +42,19 @@ interface SpriteLoaderOptions {
    * @default "generated/icons.ts"
    */
   typesOutputFile?: string;
+
+  /**
+   * Whether to generate the Icon React component.
+   * @default true
+   */
+  generateIconComponent?: boolean;
+
+  /**
+   * Output path for the Icon component file.
+   * Relative to project root.
+   * @default "generated/Icon.tsx"
+   */
+  iconComponentOutputFile?: string;
 }
 
 // Track if we've already started watching
@@ -51,7 +65,9 @@ function generateSpriteAndTypes(
   outputFile: string,
   spriteUrl: string,
   spriteFilename: string,
-  typesOutputFile?: string
+  typesOutputFile?: string,
+  generateIcon?: boolean,
+  iconComponentOutputFile?: string
 ): void {
   // Generate sprite and get symbols
   const symbols = generateSprite({
@@ -71,6 +87,45 @@ function generateSpriteAndTypes(
       outputFile: typesOutputFile,
       verbose: false,
     });
+
+    // Generate Icon component if enabled
+    if (generateIcon && iconComponentOutputFile) {
+      // Calculate relative path from component to types file
+      const componentDir = path.dirname(
+        path.resolve(process.cwd(), iconComponentOutputFile)
+      );
+      const typesFile = path.resolve(process.cwd(), typesOutputFile);
+      const typesDir = path.dirname(typesFile);
+      const typesFilename = path.basename(typesFile, path.extname(typesFile));
+
+      // Get relative path from component dir to types dir
+      const relativePath = path
+        .relative(componentDir, typesDir)
+        .replace(/\\/g, "/");
+
+      // Construct the import path
+      // If same directory, use ./filename
+      // If parent/child relationship, ensure proper path format
+      let importPath: string;
+      if (relativePath === "") {
+        importPath = `./${typesFilename}`;
+      } else if (relativePath.startsWith("..")) {
+        // Parent directory - ensure proper path
+        importPath = `${relativePath}/${typesFilename}`.replace(/\/+/g, "/");
+      } else {
+        // Child directory - ensure it starts with ./
+        const normalizedPath = relativePath.startsWith("./")
+          ? relativePath
+          : `./${relativePath}`;
+        importPath = `${normalizedPath}/${typesFilename}`.replace(/\/+/g, "/");
+      }
+
+      generateIconComponent({
+        outputFile: iconComponentOutputFile,
+        typesFileRelativePath: importPath,
+        verbose: false,
+      });
+    }
   }
 }
 
@@ -79,7 +134,9 @@ function startWatcher(
   outputFile: string,
   spriteUrl: string,
   spriteFilename: string,
-  typesOutputFile?: string
+  typesOutputFile?: string,
+  generateIcon?: boolean,
+  iconComponentOutputFile?: string
 ): void {
   if (watcherInitialized) {
     return;
@@ -103,7 +160,9 @@ function startWatcher(
         outputFile,
         spriteUrl,
         spriteFilename,
-        typesOutputFile
+        typesOutputFile,
+        generateIcon,
+        iconComponentOutputFile
       );
     }
   });
@@ -125,7 +184,7 @@ function startWatcher(
  * @example
  * ```typescript
  * // next.config.ts
- * import { withSpriteLoader } from 'svg-sprite-loader/next';
+ * import { withSpriteLoader } from 'typed-svg-sprite/next';
  *
  * export default withSpriteLoader({
  *   // your existing Next.js config
@@ -133,7 +192,7 @@ function startWatcher(
  *
  * // Then in your components:
  * import { HOME, SETTINGS } from '@/generated/icons';
- * import { Icon } from '@/components/Icon';
+ * import { Icon } from '@/generated/Icon'; // Icon component is auto-generated
  *
  * function MyComponent() {
  *   return (
@@ -156,8 +215,20 @@ function startWatcher(
  *     inputDir: "assets/icons",
  *     outputFile: "public/icons-sprite.svg",
  *     typesOutputFile: "lib/icons.ts",
+ *     iconComponentOutputFile: "components/Icon.tsx",
  *     url: "/",
  *     filename: "icons-sprite.svg"
+ *   }
+ * );
+ * ```
+ *
+ * @example
+ * ```typescript
+ * // Disable Icon component generation
+ * export default withSpriteLoader(
+ *   { /* your config *\/ },
+ *   {
+ *     generateIconComponent: false
  *   }
  * );
  * ```
@@ -171,6 +242,12 @@ export function withSpriteLoader(
   const spriteUrl = options?.url ?? "/";
   const spriteFilename = options?.filename ?? "sprite.svg";
   const typesOutputFile = options?.typesOutputFile ?? "generated/icons.ts";
+  const generateIcon =
+    options?.generateIconComponent !== false
+      ? options?.generateIconComponent ?? true
+      : false;
+  const iconComponentOutputFile =
+    options?.iconComponentOutputFile ?? "generated/Icon.tsx";
 
   // Generate sprite and types on startup
   generateSpriteAndTypes(
@@ -178,7 +255,9 @@ export function withSpriteLoader(
     outputFile,
     spriteUrl,
     spriteFilename,
-    typesOutputFile
+    typesOutputFile,
+    generateIcon,
+    generateIcon ? iconComponentOutputFile : undefined
   );
 
   // Start watcher in dev mode
@@ -189,7 +268,9 @@ export function withSpriteLoader(
       outputFile,
       spriteUrl,
       spriteFilename,
-      typesOutputFile
+      typesOutputFile,
+      generateIcon,
+      generateIcon ? iconComponentOutputFile : undefined
     );
   }
 

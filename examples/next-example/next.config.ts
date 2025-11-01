@@ -1,5 +1,5 @@
 import type { NextConfig } from "next";
-import { withSpriteLoader } from "svg-sprite-loader/next";
+import { withSpriteLoader } from "typed-svg-sprite/next";
 
 const nextConfig: NextConfig = {};
 

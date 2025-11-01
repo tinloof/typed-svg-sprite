@@ -1,12 +1,12 @@
 {
-  "name": "svg-sprite-loader",
-  "version": "1.0.0",
+  "name": "typed-svg-sprite",
+  "version": "0.0.1",
   "description": "Generate SVG sprites with TypeScript support for Next.js and CLI",
   "workspaces": [
     "examples/next-example"
   ],
   "bin": {
-    "svg-sprite-generate": "./dist/cli.js"
+    "typed-svg-sprite": "./dist/cli.js"
   },
   "exports": {
     "./next": {
@@ -35,12 +35,12 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/your-username/svg-sprite-loader.git"
+    "url": "https://github.com/your-username/typed-svg-sprite.git"
   },
   "bugs": {
-    "url": "https://github.com/your-username/svg-sprite-loader/issues"
+    "url": "https://github.com/your-username/typed-svg-sprite/issues"
   },
-  "homepage": "https://github.com/your-username/svg-sprite-loader#readme",
+  "homepage": "https://github.com/your-username/typed-svg-sprite#readme",
   "engines": {
     "node": ">=14.0.0"
   },

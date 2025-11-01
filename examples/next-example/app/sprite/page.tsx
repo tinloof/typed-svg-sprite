@@ -1,7 +1,7 @@
 export const dynamic = "force-dynamic";
 
 import { PreloadSprite } from "@/components/PreloadSprite";
-import { Icon } from "../../components/Icon";
+import { Icon } from "@/generated/Icon";
 
 import {
   HOME,

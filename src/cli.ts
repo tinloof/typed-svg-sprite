@@ -49,7 +49,7 @@ function printHelp() {
 SVG Sprite Generator
 
 Usage:
-  svg-sprite-generate --input <dir> --output <file> [options]
+  typed-svg-sprite --input <dir> --output <file> [options]
 
 Options:
   -i, --input <dir>    Directory containing SVG files
@@ -58,8 +58,8 @@ Options:
   -h, --help           Show this help message
 
 Examples:
-  svg-sprite-generate --input public/icons --output public/sprite.svg
-  svg-sprite-generate -i ./icons -o ./dist/sprite.svg --watch
+  typed-svg-sprite --input public/icons --output public/sprite.svg
+  typed-svg-sprite -i ./icons -o ./dist/sprite.svg --watch
 `);
 }
 
