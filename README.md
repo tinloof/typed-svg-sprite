@@ -1,4 +1,4 @@
-# typed-svg-sprite
+# @tinloof/typed-svg-sprite
 
 > Generate optimized SVG sprites with full TypeScript support
 
@@ -7,7 +7,7 @@ Automatically generates SVG sprite files with type-safe TypeScript definitions a
 ## Installation
 
 ```bash
-npm install typed-svg-sprite
+npm install @tinloof/typed-svg-sprite
 ```
 
 ## Quick Start
@@ -26,7 +26,7 @@ typed-svg-sprite -i public/icons -o public/sprite.svg --watch
 
 ```typescript
 // next.config.ts
-import { withSpriteLoader } from "typed-svg-sprite/next";
+import { withSpriteLoader } from "@tinloof/typed-svg-sprite/next";
 
 export default withSpriteLoader({});
 ```

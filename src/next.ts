@@ -184,7 +184,7 @@ function startWatcher(
  * @example
  * ```typescript
  * // next.config.ts
- * import { withSpriteLoader } from 'typed-svg-sprite/next';
+ * import { withSpriteLoader } from '@tinloof/typed-svg-sprite/next';
  *
  * export default withSpriteLoader({
  *   // your existing Next.js config

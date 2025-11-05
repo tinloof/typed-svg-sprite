@@ -16,7 +16,7 @@
     "next": "15.5.4",
     "react": "19.1.0",
     "react-dom": "19.1.0",
-    "typed-svg-sprite": "file:../..",
+    "@tinloof/typed-svg-sprite": "file:../..",
     "tailwindcss": "^4"
   },
   "devDependencies": {
