@@ -1,5 +1,0 @@
-{
-  "installCommand": "cd ../.. && pnpm install",
-  "buildCommand": "cd ../.. && pnpm run build && cd examples/next-example && pnpm run build:next"
-}
-
