@@ -2,7 +2,7 @@
 
 > Generate optimized SVG sprites with full TypeScript support
 
-Automatically generates SVG sprite files with type-safe TypeScript definitions and a ready-to-use React component.
+Automatically generates SVG sprite files with type-safe TypeScript definitions and a ready-to-use React component. Works with Next.js, Astro, or standalone via CLI.
 
 ## Installation
 
@@ -47,6 +47,28 @@ function MyComponent() {
 }
 ```
 
+### Astro
+
+```typescript
+// astro.config.mjs
+import { defineConfig } from "astro/config";
+import { svgSprite } from "@tinloof/typed-svg-sprite/astro";
+
+export default defineConfig({
+  integrations: [svgSprite()],
+});
+```
+
+Place SVGs in `public/icons/` and use:
+
+```typescript
+import { HOME, SETTINGS } from "../generated/icons";
+import { Icon } from "../generated/Icon";
+
+<Icon href={HOME} />
+<Icon href={SETTINGS} size={32} />
+```
+
 ## Usage
 
 ### CLI Options
@@ -78,6 +100,24 @@ export default withSpriteLoader(
     iconComponentOutputFile?: string; // default: "generated/Icon.tsx"
   }
 );
+```
+
+### Astro Configuration
+
+```typescript
+export default defineConfig({
+  integrations: [
+    svgSprite({
+      inputDir?: string; // default: "public/icons"
+      outputFile?: string; // default: "public/sprite.svg"
+      url?: string; // default: "/"
+      filename?: string; // default: "sprite.svg"
+      typesOutputFile?: string; // default: "src/generated/icons.ts"
+      generateIconComponent?: boolean; // default: true
+      iconComponentOutputFile?: string; // default: "src/generated/Icon.tsx"
+    }),
+  ],
+});
 ```
 
 ## Generated Files
