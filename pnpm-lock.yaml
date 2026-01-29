@@ -39,6 +39,9 @@ importers:
       '@astrojs/react':
         specifier: ^4.4.2
         version: 4.4.2(@types/node@20.19.25)(@types/react-dom@19.2.3(@types/react@19.2.10))(@types/react@19.2.10)(jiti@2.6.1)(lightningcss@1.30.2)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
+      '@tailwindcss/vite':
+        specifier: ^4.1.18
+        version: 4.1.18(vite@6.4.1(@types/node@20.19.25)(jiti@2.6.1)(lightningcss@1.30.2))
       '@tinloof/typed-svg-sprite':
         specifier: file:../..
         version: file:(astro@5.16.16(@types/node@20.19.25)(jiti@2.6.1)(lightningcss@1.30.2)(rollup@4.57.0)(typescript@5.9.3))(next@15.5.9(react-dom@19.1.0(react@19.1.0))(react@19.1.0))
@@ -57,6 +60,9 @@ importers:
       react-dom:
         specifier: ^19.2.4
         version: 19.2.4(react@19.2.4)
+      tailwindcss:
+        specifier: ^4.1.18
+        version: 4.1.18
     devDependencies:
       typescript:
         specifier: ^5
@@ -982,6 +988,11 @@ packages:
 
   '@tailwindcss/postcss@4.1.18':
     resolution: {integrity: sha512-Ce0GFnzAOuPyfV5SxjXGn0CubwGcuDB0zcdaPuCSzAa/2vII24JTkH+I6jcbXLb1ctjZMZZI6OjDaLPJQL1S0g==}
+
+  '@tailwindcss/vite@4.1.18':
+    resolution: {integrity: sha512-jVA+/UpKL1vRLg6Hkao5jldawNmRo7mQYrZtNHMIVpLfLhDml5nMRUo/8MwoX2vNXvnaXNNMedrMfMugAVX1nA==}
+    peerDependencies:
+      vite: ^5.2.0 || ^6 || ^7
 
   '@tinloof/typed-svg-sprite@file:':
     resolution: {directory: '', type: directory}
@@ -3425,6 +3436,13 @@ snapshots:
       '@tailwindcss/oxide': 4.1.18
       postcss: 8.5.6
       tailwindcss: 4.1.18
+
+  '@tailwindcss/vite@4.1.18(vite@6.4.1(@types/node@20.19.25)(jiti@2.6.1)(lightningcss@1.30.2))':
+    dependencies:
+      '@tailwindcss/node': 4.1.18
+      '@tailwindcss/oxide': 4.1.18
+      tailwindcss: 4.1.18
+      vite: 6.4.1(@types/node@20.19.25)(jiti@2.6.1)(lightningcss@1.30.2)
 
   '@tinloof/typed-svg-sprite@file:(astro@5.16.16(@types/node@20.19.25)(jiti@2.6.1)(lightningcss@1.30.2)(rollup@4.57.0)(typescript@5.9.3))(next@15.5.9(react-dom@19.1.0(react@19.1.0))(react@19.1.0))':
     dependencies:
