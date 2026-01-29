@@ -1,5 +1,5 @@
 ---
-"@tinloof/typed-svg-sprite": patch
+"@tinloof/typed-svg-sprite": minor
 ---
 
 Added astro integration
