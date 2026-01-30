@@ -3,6 +3,7 @@ dist/
 
 # generated
 src/generated/
+public/sprite.svg
 
 # dependencies
 node_modules/
