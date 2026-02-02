@@ -1,5 +1,8 @@
 import { generateSpriteAndTypes, startWatcher } from "./shared.js";
 
+// Prevent double generation when Next.js loads config multiple times
+let hasGenerated = false;
+
 // Minimal Next.js config types we need
 interface NextConfig {
   [key: string]: any;
@@ -46,9 +49,9 @@ interface SpriteLoaderOptions {
   generateIconComponent?: boolean;
 
   /**
-   * Output path for the Icon component file.
+   * Output path for the Icon component file (without extension).
    * Relative to project root.
-   * @default "generated/Icon.tsx"
+   * @default "generated/Icon"
    */
   iconComponentOutputFile?: string;
 }
@@ -127,36 +130,36 @@ export function withSpriteLoader(
   const spriteUrl = options?.url ?? "/";
   const spriteFilename = options?.filename ?? "sprite.svg";
   const typesOutputFile = options?.typesOutputFile ?? "generated/icons.ts";
-  const generateIcon =
-    options?.generateIconComponent !== false
-      ? options?.generateIconComponent ?? true
-      : false;
+  const generateIcon = options?.generateIconComponent === false ? false : { react: true };
   const iconComponentOutputFile =
-    options?.iconComponentOutputFile ?? "generated/Icon.tsx";
+    options?.iconComponentOutputFile ?? "generated/Icon";
 
-  // Generate sprite and types on startup
-  generateSpriteAndTypes(
-    inputDir,
-    outputFile,
-    spriteUrl,
-    spriteFilename,
-    typesOutputFile,
-    generateIcon,
-    generateIcon ? iconComponentOutputFile : undefined
-  );
-
-  // Start watcher in dev mode
-  const isDev = process.env.NODE_ENV === "development";
-  if (isDev) {
-    startWatcher(
+  // Generate sprite and types on startup (only once)
+  if (!hasGenerated) {
+    hasGenerated = true;
+    generateSpriteAndTypes(
       inputDir,
       outputFile,
       spriteUrl,
       spriteFilename,
       typesOutputFile,
       generateIcon,
-      generateIcon ? iconComponentOutputFile : undefined
+      iconComponentOutputFile
     );
+
+    // Start watcher in dev mode
+    const isDev = process.env.NODE_ENV === "development";
+    if (isDev) {
+      startWatcher(
+        inputDir,
+        outputFile,
+        spriteUrl,
+        spriteFilename,
+        typesOutputFile,
+        generateIcon,
+        iconComponentOutputFile
+      );
+    }
   }
 
   // Return config without loader modifications

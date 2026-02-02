@@ -1,5 +1,9 @@
 import type { AstroIntegration } from "astro";
-import { generateSpriteAndTypes, startWatcher } from "./shared.js";
+import {
+  generateSpriteAndTypes,
+  startWatcher,
+  type GenerateIconOption,
+} from "./shared.js";
 
 export interface SpriteIntegrationOptions {
   /**
@@ -36,15 +40,22 @@ export interface SpriteIntegrationOptions {
   typesOutputFile?: string;
 
   /**
-   * Whether to generate the Icon React component.
-   * @default true
+   * Whether to generate the Icon component.
+   * - `true`: generates both Astro and React components
+   * - `false`: generates no component
+   * - `{ astro?: boolean, react?: boolean }`: choose which to generate
+   * @default { astro: true }
    */
-  generateIconComponent?: boolean;
+  generateIconComponent?: boolean | {
+    astro?: boolean
+    react?: boolean
+  };
 
   /**
-   * Output path for the Icon component file.
+   * Output path for the Icon component file (without extension).
+   * Extension will be added based on component type (.astro, .tsx).
    * Relative to project root.
-   * @default "src/generated/Icon.tsx"
+   * @default "src/generated/Icon"
    */
   iconComponentOutputFile?: string;
 }
@@ -68,12 +79,14 @@ export function svgSprite(options?: SpriteIntegrationOptions): AstroIntegration 
   const spriteUrl = options?.url ?? "/";
   const spriteFilename = options?.filename ?? "sprite.svg";
   const typesOutputFile = options?.typesOutputFile ?? "src/generated/icons.ts";
-  const generateIcon =
-    options?.generateIconComponent !== false
-      ? options?.generateIconComponent ?? true
-      : false;
+  const generateIcon: GenerateIconOption =
+    options?.generateIconComponent === false
+      ? false
+      : options?.generateIconComponent === true
+        ? true
+        : options?.generateIconComponent ?? { astro: true };
   const iconComponentOutputFile =
-    options?.iconComponentOutputFile ?? "src/generated/Icon.tsx";
+    options?.iconComponentOutputFile ?? "src/generated/Icon";
 
   return {
     name: "typed-svg-sprite",
@@ -87,7 +100,7 @@ export function svgSprite(options?: SpriteIntegrationOptions): AstroIntegration 
           spriteFilename,
           typesOutputFile,
           generateIcon,
-          generateIcon ? iconComponentOutputFile : undefined
+          iconComponentOutputFile
         );
 
         // Watch in dev mode
@@ -99,7 +112,7 @@ export function svgSprite(options?: SpriteIntegrationOptions): AstroIntegration 
             spriteFilename,
             typesOutputFile,
             generateIcon,
-            generateIcon ? iconComponentOutputFile : undefined
+            iconComponentOutputFile
           );
         }
       },
@@ -112,7 +125,7 @@ export function svgSprite(options?: SpriteIntegrationOptions): AstroIntegration 
           spriteFilename,
           typesOutputFile,
           generateIcon,
-          generateIcon ? iconComponentOutputFile : undefined
+          iconComponentOutputFile
         );
       },
     },

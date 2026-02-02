@@ -1,0 +1,180 @@
+---
+import Icon from "@/generated/Icon.astro";
+
+import {
+  HOME,
+  HOME_FILLED,
+  SETTINGS,
+  DASHBOARD,
+  REORDER,
+  SEARCH,
+  SEARCH_OFF,
+  ADD_TASK,
+  DELETE,
+  DELETE_FOREVER,
+  DELETE_OUTLINE,
+  EDIT_OFF,
+  DONE,
+  DONE_ALL,
+  DONE_OUTLINE,
+  REMOVE_DONE,
+  FAVORITE,
+  FAVORITE_BORDER,
+  THUMB_UP,
+  THUMB_DOWN,
+  THUMB_UP_OFF_ALT,
+  THUMB_DOWN_OFF_ALT,
+  THUMBS_UP_DOWN,
+  STARS,
+  STAR_RATE,
+  GRADE,
+  FEEDBACK,
+  QUESTION_ANSWER,
+  QUICKREPLY,
+  COMMENT_BANK,
+  ANNOUNCEMENT,
+  CONTACT_SUPPORT,
+  CONTACT_PAGE,
+  INFO,
+  INFO_OUTLINE,
+  HELP,
+  HELP_OUTLINE,
+  HELP_CENTER,
+  SUPPORT,
+  LOCK,
+  LOCK_OPEN,
+  LOCK_OUTLINE,
+  LOCK_CLOCK,
+  VERIFIED,
+  VERIFIED_USER,
+  FINGERPRINT,
+  PRIVACY_TIP,
+  ADMIN_PANEL_SETTINGS,
+  SHOPPING_CART,
+  SHOPPING_BASKET,
+  SHOPPING_BAG,
+  ADD_SHOPPING_CART,
+  REMOVE_SHOPPING_CART,
+  STORE,
+  SHOP,
+  SHOP_TWO,
+  PAYMENT,
+  CREDIT_CARD,
+  CARD_GIFTCARD,
+  CARD_MEMBERSHIP,
+  CARD_TRAVEL,
+  REDEEM,
+  LOYALTY,
+  ACCOUNT_BALANCE,
+  ACCOUNT_BALANCE_WALLET,
+  EURO_SYMBOL,
+  RECEIPT,
+  TOLL,
+  CALENDAR_TODAY,
+  CALENDAR_VIEW_DAY,
+  EVENT,
+  EVENT_SEAT,
+  TODAY,
+  DATE_RANGE,
+  SCHEDULE,
+  SCHEDULE_SEND,
+  QUERY_BUILDER,
+  HISTORY,
+  HISTORY_TOGGLE_OFF,
+  WATCH_LATER,
+  HOURGLASS_EMPTY,
+  HOURGLASS_FULL,
+  HOURGLASS_DISABLED,
+  ALARM,
+  ALARM_ADD,
+  ALARM_ON,
+  ALARM_OFF,
+  DESCRIPTION,
+  ARTICLE,
+  ASSIGNMENT,
+  ASSIGNMENT_LATE,
+  ASSIGNMENT_RETURN,
+  ASSIGNMENT_RETURNED,
+  ASSIGNMENT_TURNED_IN,
+  FILE_PRESENT,
+  REQUEST_PAGE,
+  NOTE_ADD,
+  STICKY_NOTE_2,
+  SUBJECT,
+  BOOK,
+  BOOK_ONLINE,
+  BOOKMARKS,
+  BOOKMARK,
+  BOOKMARK_BORDER,
+  CHROME_READER_MODE,
+  ANALYTICS,
+  ASSESSMENT,
+  TIMELINE,
+  TRENDING_UP,
+  TRENDING_DOWN,
+  TRENDING_FLAT,
+  LEADERBOARD,
+  DONUT_LARGE,
+  DONUT_SMALL,
+  ADDCHART,
+} from "@/generated/icons";
+
+const iconHrefs = [
+  HOME, HOME_FILLED, SETTINGS, DASHBOARD, REORDER, SEARCH, SEARCH_OFF,
+  ADD_TASK, DELETE, DELETE_FOREVER, DELETE_OUTLINE, EDIT_OFF, DONE, DONE_ALL, DONE_OUTLINE, REMOVE_DONE,
+  FAVORITE, FAVORITE_BORDER, THUMB_UP, THUMB_DOWN, THUMB_UP_OFF_ALT, THUMB_DOWN_OFF_ALT, THUMBS_UP_DOWN, STARS, STAR_RATE, GRADE,
+  FEEDBACK, QUESTION_ANSWER, QUICKREPLY, COMMENT_BANK, ANNOUNCEMENT, CONTACT_SUPPORT, CONTACT_PAGE,
+  INFO, INFO_OUTLINE, HELP, HELP_OUTLINE, HELP_CENTER, SUPPORT,
+  LOCK, LOCK_OPEN, LOCK_OUTLINE, LOCK_CLOCK, VERIFIED, VERIFIED_USER, FINGERPRINT, PRIVACY_TIP, ADMIN_PANEL_SETTINGS,
+  SHOPPING_CART, SHOPPING_BASKET, SHOPPING_BAG, ADD_SHOPPING_CART, REMOVE_SHOPPING_CART, STORE, SHOP, SHOP_TWO, PAYMENT, CREDIT_CARD, CARD_GIFTCARD, CARD_MEMBERSHIP, CARD_TRAVEL, REDEEM, LOYALTY,
+  ACCOUNT_BALANCE, ACCOUNT_BALANCE_WALLET, EURO_SYMBOL, RECEIPT, TOLL,
+  CALENDAR_TODAY, CALENDAR_VIEW_DAY, EVENT, EVENT_SEAT, TODAY, DATE_RANGE, SCHEDULE, SCHEDULE_SEND, QUERY_BUILDER, HISTORY, HISTORY_TOGGLE_OFF, WATCH_LATER, HOURGLASS_EMPTY, HOURGLASS_FULL, HOURGLASS_DISABLED, ALARM, ALARM_ADD, ALARM_ON, ALARM_OFF,
+  DESCRIPTION, ARTICLE, ASSIGNMENT, ASSIGNMENT_LATE, ASSIGNMENT_RETURN, ASSIGNMENT_RETURNED, ASSIGNMENT_TURNED_IN, FILE_PRESENT, REQUEST_PAGE, NOTE_ADD, STICKY_NOTE_2, SUBJECT,
+  BOOK, BOOK_ONLINE, BOOKMARKS, BOOKMARK, BOOKMARK_BORDER, CHROME_READER_MODE,
+  ANALYTICS, ASSESSMENT, TIMELINE, TRENDING_UP, TRENDING_DOWN, TRENDING_FLAT, LEADERBOARD, DONUT_LARGE, DONUT_SMALL, ADDCHART,
+];
+
+const randomIcons = Array.from({ length: 200 }, (_, i) => ({
+  href: iconHrefs[Math.floor(Math.random() * iconHrefs.length)],
+  key: i,
+}));
+---
+
+<div class="min-h-screen">
+  <div class="flex flex-wrap gap-4 p-8">
+    {randomIcons.map(({ href }) => (
+      <Icon href={href} />
+    ))}
+  </div>
+
+  <div class="max-w-4xl mx-auto p-8">
+    <h2 class="text-2xl font-bold mb-4">SVG Sprite Approach</h2>
+
+    <div class="grid md:grid-cols-2 gap-6 mb-6">
+      <div class="p-4 bg-green-50 rounded">
+        <h3 class="font-semibold text-green-800 mb-2">Pros</h3>
+        <ul class="text-sm space-y-1">
+          <li><strong>Single HTTP request</strong> - One cached file for all icons</li>
+          <li><strong>Minimal DOM</strong> - Tiny &lt;svg&gt;&lt;use&gt; references</li>
+          <li><strong>Excellent compression</strong> - ~25-30KB compressed</li>
+          <li><strong>Fast navigation</strong> - Icons cached across pages</li>
+          <li><strong>CSS styling</strong> - Easy to customize colors</li>
+        </ul>
+      </div>
+
+      <div class="p-4 bg-red-50 rounded">
+        <h3 class="font-semibold text-red-800 mb-2">Cons</h3>
+        <ul class="text-sm space-y-1">
+          <li><strong>Unused icons included</strong> - All 115 icons in bundle</li>
+          <li><strong>Not tree-shakeable</strong> - Can't auto-remove unused</li>
+          <li><strong>Initial load overhead</strong> - Downloads all upfront</li>
+          <li><strong>Build step required</strong> - Sprite generation needed</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="p-4 bg-blue-50 rounded text-sm">
+      <strong>Best for:</strong> Apps with 20+ icons across multiple pages. The sprite (115 icons) is only 56KB uncompressed (~18-25KB compressed). Once cached, navigation is instant with zero additional downloads.
+    </div>
+  </div>
+</div>

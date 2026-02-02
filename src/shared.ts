@@ -2,10 +2,44 @@ import * as fs from "fs";
 import * as path from "path";
 import { generateSprite } from "./core.js";
 import { generateTypesFile } from "./types.js";
-import { generateIconComponent } from "./components.js";
+import {
+  generateReactIconComponent,
+  generateAstroIconComponent,
+} from "./components.js";
+
+export type GenerateIconOption =
+  | boolean
+  | { astro?: boolean; react?: boolean };
 
 // Track if we've already started watching
 let watcherInitialized = false;
+
+function getTypesImportPath(
+  componentOutputFile: string,
+  typesOutputFile: string
+): string {
+  const componentDir = path.dirname(
+    path.resolve(process.cwd(), componentOutputFile)
+  );
+  const typesFile = path.resolve(process.cwd(), typesOutputFile);
+  const typesDir = path.dirname(typesFile);
+  const typesFilename = path.basename(typesFile, path.extname(typesFile));
+
+  const relativePath = path
+    .relative(componentDir, typesDir)
+    .replace(/\\/g, "/");
+
+  if (relativePath === "") {
+    return `./${typesFilename}`;
+  } else if (relativePath.startsWith("..")) {
+    return `${relativePath}/${typesFilename}`.replace(/\/+/g, "/");
+  } else {
+    const normalizedPath = relativePath.startsWith("./")
+      ? relativePath
+      : `./${relativePath}`;
+    return `${normalizedPath}/${typesFilename}`.replace(/\/+/g, "/");
+  }
+}
 
 export function generateSpriteAndTypes(
   inputDir: string,
@@ -13,7 +47,7 @@ export function generateSpriteAndTypes(
   spriteUrl: string,
   spriteFilename: string,
   typesOutputFile?: string,
-  generateIcon?: boolean,
+  generateIcon?: GenerateIconOption,
   iconComponentOutputFile?: string
 ): void {
   // Generate sprite and get symbols
@@ -35,43 +69,36 @@ export function generateSpriteAndTypes(
       verbose: false,
     });
 
-    // Generate Icon component if enabled
-    if (generateIcon && iconComponentOutputFile) {
-      // Calculate relative path from component to types file
-      const componentDir = path.dirname(
-        path.resolve(process.cwd(), iconComponentOutputFile)
-      );
-      const typesFile = path.resolve(process.cwd(), typesOutputFile);
-      const typesDir = path.dirname(typesFile);
-      const typesFilename = path.basename(typesFile, path.extname(typesFile));
+    // Determine which components to generate
+    const shouldGenerateAstro =
+      generateIcon === true ||
+      (typeof generateIcon === "object" && generateIcon.astro === true);
+    const shouldGenerateReact =
+      generateIcon === true ||
+      (typeof generateIcon === "object" && generateIcon.react === true);
 
-      // Get relative path from component dir to types dir
-      const relativePath = path
-        .relative(componentDir, typesDir)
-        .replace(/\\/g, "/");
+    if (iconComponentOutputFile && (shouldGenerateAstro || shouldGenerateReact)) {
+      const baseOutputFile = iconComponentOutputFile.replace(/\.(tsx|astro)$/, "");
 
-      // Construct the import path
-      // If same directory, use ./filename
-      // If parent/child relationship, ensure proper path format
-      let importPath: string;
-      if (relativePath === "") {
-        importPath = `./${typesFilename}`;
-      } else if (relativePath.startsWith("..")) {
-        // Parent directory - ensure proper path
-        importPath = `${relativePath}/${typesFilename}`.replace(/\/+/g, "/");
-      } else {
-        // Child directory - ensure it starts with ./
-        const normalizedPath = relativePath.startsWith("./")
-          ? relativePath
-          : `./${relativePath}`;
-        importPath = `${normalizedPath}/${typesFilename}`.replace(/\/+/g, "/");
+      if (shouldGenerateAstro) {
+        const astroOutputFile = `${baseOutputFile}.astro`;
+        const importPath = getTypesImportPath(astroOutputFile, typesOutputFile);
+        generateAstroIconComponent({
+          outputFile: astroOutputFile,
+          typesFileRelativePath: importPath,
+          verbose: false,
+        });
       }
 
-      generateIconComponent({
-        outputFile: iconComponentOutputFile,
-        typesFileRelativePath: importPath,
-        verbose: false,
-      });
+      if (shouldGenerateReact) {
+        const reactOutputFile = `${baseOutputFile}.tsx`;
+        const importPath = getTypesImportPath(reactOutputFile, typesOutputFile);
+        generateReactIconComponent({
+          outputFile: reactOutputFile,
+          typesFileRelativePath: importPath,
+          verbose: false,
+        });
+      }
     }
   }
 }
@@ -82,7 +109,7 @@ export function startWatcher(
   spriteUrl: string,
   spriteFilename: string,
   typesOutputFile?: string,
-  generateIcon?: boolean,
+  generateIcon?: GenerateIconOption,
   iconComponentOutputFile?: string
 ): void {
   if (watcherInitialized) {
