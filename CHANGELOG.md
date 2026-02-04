@@ -1,5 +1,11 @@
 # @tinloof/typed-svg-sprite
 
+## 0.1.0
+
+### Minor Changes
+
+- b2234dd: Added astro integration
+
 ## 0.0.1
 
 ### Patch Changes
