@@ -9,6 +9,10 @@
     "./next": {
       "types": "./dist/next.d.ts",
       "default": "./dist/next.js"
+    },
+    "./astro": {
+      "types": "./dist/astro.d.ts",
+      "default": "./dist/astro.js"
     }
   },
   "scripts": {
@@ -30,6 +34,7 @@
     "icon",
     "typescript",
     "nextjs",
+    "astro",
     "cli"
   ],
   "author": "LHDi <elhadi98@gmail.com>",
@@ -52,12 +57,16 @@
   "peerDependenciesMeta": {
     "next": {
       "optional": true
+    },
+    "astro": {
+      "optional": true
     }
   },
   "devDependencies": {
     "@changesets/cli": "^2.29.7",
     "@types/cheerio": "^0.22.35",
     "@types/node": "^20.0.0",
+    "astro": "^5.0.0",
     "rimraf": "^5.0.5",
     "typescript": "^5.0.0"
   }

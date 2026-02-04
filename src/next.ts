@@ -1,8 +1,7 @@
-import * as fs from "fs";
-import * as path from "path";
-import { generateSprite } from "./core.js";
-import { generateTypesFile } from "./types.js";
-import { generateIconComponent } from "./components.js";
+import { generateSpriteAndTypes, startWatcher } from "./shared.js";
+
+// Prevent double generation when Next.js loads config multiple times
+let hasGenerated = false;
 
 // Minimal Next.js config types we need
 interface NextConfig {
@@ -50,122 +49,11 @@ interface SpriteLoaderOptions {
   generateIconComponent?: boolean;
 
   /**
-   * Output path for the Icon component file.
+   * Output path for the Icon component file (without extension).
    * Relative to project root.
-   * @default "generated/Icon.tsx"
+   * @default "generated/Icon"
    */
   iconComponentOutputFile?: string;
-}
-
-// Track if we've already started watching
-let watcherInitialized = false;
-
-function generateSpriteAndTypes(
-  inputDir: string,
-  outputFile: string,
-  spriteUrl: string,
-  spriteFilename: string,
-  typesOutputFile?: string,
-  generateIcon?: boolean,
-  iconComponentOutputFile?: string
-): void {
-  // Generate sprite and get symbols
-  const symbols = generateSprite({
-    inputDir,
-    outputFile,
-    verbose: true,
-    minify: true,
-    optimize: true,
-  });
-
-  // Generate TypeScript types file if specified
-  if (typesOutputFile && symbols.length > 0) {
-    generateTypesFile({
-      symbols,
-      spriteUrl,
-      spriteFilename,
-      outputFile: typesOutputFile,
-      verbose: false,
-    });
-
-    // Generate Icon component if enabled
-    if (generateIcon && iconComponentOutputFile) {
-      // Calculate relative path from component to types file
-      const componentDir = path.dirname(
-        path.resolve(process.cwd(), iconComponentOutputFile)
-      );
-      const typesFile = path.resolve(process.cwd(), typesOutputFile);
-      const typesDir = path.dirname(typesFile);
-      const typesFilename = path.basename(typesFile, path.extname(typesFile));
-
-      // Get relative path from component dir to types dir
-      const relativePath = path
-        .relative(componentDir, typesDir)
-        .replace(/\\/g, "/");
-
-      // Construct the import path
-      // If same directory, use ./filename
-      // If parent/child relationship, ensure proper path format
-      let importPath: string;
-      if (relativePath === "") {
-        importPath = `./${typesFilename}`;
-      } else if (relativePath.startsWith("..")) {
-        // Parent directory - ensure proper path
-        importPath = `${relativePath}/${typesFilename}`.replace(/\/+/g, "/");
-      } else {
-        // Child directory - ensure it starts with ./
-        const normalizedPath = relativePath.startsWith("./")
-          ? relativePath
-          : `./${relativePath}`;
-        importPath = `${normalizedPath}/${typesFilename}`.replace(/\/+/g, "/");
-      }
-
-      generateIconComponent({
-        outputFile: iconComponentOutputFile,
-        typesFileRelativePath: importPath,
-        verbose: false,
-      });
-    }
-  }
-}
-
-function startWatcher(
-  inputDir: string,
-  outputFile: string,
-  spriteUrl: string,
-  spriteFilename: string,
-  typesOutputFile?: string,
-  generateIcon?: boolean,
-  iconComponentOutputFile?: string
-): void {
-  if (watcherInitialized) {
-    return;
-  }
-
-  const projectRoot = process.cwd();
-  const absoluteInputDir = path.resolve(projectRoot, inputDir);
-
-  if (!fs.existsSync(absoluteInputDir)) {
-    return;
-  }
-
-  watcherInitialized = true;
-  console.log(`[svg-sprite] 👀 Watching ${inputDir} for changes...`);
-
-  fs.watch(absoluteInputDir, { recursive: true }, (eventType, filename) => {
-    if (filename?.endsWith(".svg")) {
-      console.log(`[svg-sprite] Change detected: ${filename}`);
-      generateSpriteAndTypes(
-        inputDir,
-        outputFile,
-        spriteUrl,
-        spriteFilename,
-        typesOutputFile,
-        generateIcon,
-        iconComponentOutputFile
-      );
-    }
-  });
 }
 
 /**
@@ -242,36 +130,36 @@ export function withSpriteLoader(
   const spriteUrl = options?.url ?? "/";
   const spriteFilename = options?.filename ?? "sprite.svg";
   const typesOutputFile = options?.typesOutputFile ?? "generated/icons.ts";
-  const generateIcon =
-    options?.generateIconComponent !== false
-      ? options?.generateIconComponent ?? true
-      : false;
+  const generateIcon = options?.generateIconComponent === false ? false : { react: true };
   const iconComponentOutputFile =
-    options?.iconComponentOutputFile ?? "generated/Icon.tsx";
+    options?.iconComponentOutputFile ?? "generated/Icon";
 
-  // Generate sprite and types on startup
-  generateSpriteAndTypes(
-    inputDir,
-    outputFile,
-    spriteUrl,
-    spriteFilename,
-    typesOutputFile,
-    generateIcon,
-    generateIcon ? iconComponentOutputFile : undefined
-  );
-
-  // Start watcher in dev mode
-  const isDev = process.env.NODE_ENV === "development";
-  if (isDev) {
-    startWatcher(
+  // Generate sprite and types on startup (only once)
+  if (!hasGenerated) {
+    hasGenerated = true;
+    generateSpriteAndTypes(
       inputDir,
       outputFile,
       spriteUrl,
       spriteFilename,
       typesOutputFile,
       generateIcon,
-      generateIcon ? iconComponentOutputFile : undefined
+      iconComponentOutputFile
     );
+
+    // Start watcher in dev mode
+    const isDev = process.env.NODE_ENV === "development";
+    if (isDev) {
+      startWatcher(
+        inputDir,
+        outputFile,
+        spriteUrl,
+        spriteFilename,
+        typesOutputFile,
+        generateIcon,
+        iconComponentOutputFile
+      );
+    }
   }
 
   // Return config without loader modifications
