@@ -5,13 +5,13 @@
   "private": true,
   "scripts": {
     "dev": "astro dev",
-    "build": "npm run build --prefix ../.. && astro build",
+    "build": "pnpm -C ../.. run build && astro build",
     "build:astro": "astro build",
     "preview": "astro preview"
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.1.18",
-    "@tinloof/typed-svg-sprite": "file:../..",
+    "@tinloof/typed-svg-sprite": "workspace:*",
     "astro": "^5.0.0",
     "tailwindcss": "^4.1.18"
   },

@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
-    "build": "npm run build --prefix ../.. && next build --turbopack",
+    "build": "pnpm -C ../.. run build && next build --turbopack",
     "build:next": "next build --turbopack",
     "start": "next start",
     "lint": "biome check",
@@ -16,7 +16,7 @@
     "next": "15.5.9",
     "react": "19.1.0",
     "react-dom": "19.1.0",
-    "@tinloof/typed-svg-sprite": "file:../..",
+    "@tinloof/typed-svg-sprite": "workspace:*",
     "tailwindcss": "^4"
   },
   "devDependencies": {

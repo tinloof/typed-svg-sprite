@@ -40,8 +40,8 @@ importers:
         specifier: ^4.1.18
         version: 4.1.18(vite@6.4.1(@types/node@20.19.25)(jiti@2.6.1)(lightningcss@1.30.2))
       '@tinloof/typed-svg-sprite':
-        specifier: file:../..
-        version: file:(astro@5.16.16(@types/node@20.19.25)(jiti@2.6.1)(lightningcss@1.30.2)(rollup@4.57.0)(typescript@5.9.3))(next@15.5.9(react-dom@19.1.0(react@19.1.0))(react@19.1.0))
+        specifier: workspace:*
+        version: link:../..
       astro:
         specifier: ^5.0.0
         version: 5.16.16(@types/node@20.19.25)(jiti@2.6.1)(lightningcss@1.30.2)(rollup@4.57.0)(typescript@5.9.3)
@@ -59,8 +59,8 @@ importers:
         specifier: ^4
         version: 4.1.18
       '@tinloof/typed-svg-sprite':
-        specifier: file:../..
-        version: file:(astro@5.16.16(@types/node@20.19.25)(jiti@2.6.1)(lightningcss@1.30.2)(rollup@4.57.0)(typescript@5.9.3))(next@15.5.9(react-dom@19.1.0(react@19.1.0))(react@19.1.0))
+        specifier: workspace:*
+        version: link:../..
       material-symbols:
         specifier: ^0.37.0
         version: 0.37.0
@@ -900,19 +900,6 @@ packages:
     resolution: {integrity: sha512-jVA+/UpKL1vRLg6Hkao5jldawNmRo7mQYrZtNHMIVpLfLhDml5nMRUo/8MwoX2vNXvnaXNNMedrMfMugAVX1nA==}
     peerDependencies:
       vite: ^5.2.0 || ^6 || ^7
-
-  '@tinloof/typed-svg-sprite@file:':
-    resolution: {directory: '', type: directory}
-    engines: {node: '>=14.0.0'}
-    hasBin: true
-    peerDependencies:
-      astro: '*'
-      next: '*'
-    peerDependenciesMeta:
-      astro:
-        optional: true
-      next:
-        optional: true
 
   '@types/cheerio@0.22.35':
     resolution: {integrity: sha512-yD57BchKRvTV+JD53UZ6PD8KWY5g5rvvMLRnZR3EQBCZXiDT/HR+pKpMzFGlWNhFrXlo7VPZXtKvIEwZkAWOIA==}
@@ -3134,14 +3121,6 @@ snapshots:
       '@tailwindcss/oxide': 4.1.18
       tailwindcss: 4.1.18
       vite: 6.4.1(@types/node@20.19.25)(jiti@2.6.1)(lightningcss@1.30.2)
-
-  '@tinloof/typed-svg-sprite@file:(astro@5.16.16(@types/node@20.19.25)(jiti@2.6.1)(lightningcss@1.30.2)(rollup@4.57.0)(typescript@5.9.3))(next@15.5.9(react-dom@19.1.0(react@19.1.0))(react@19.1.0))':
-    dependencies:
-      cheerio: 1.1.2
-      glob: 10.4.5
-    optionalDependencies:
-      astro: 5.16.16(@types/node@20.19.25)(jiti@2.6.1)(lightningcss@1.30.2)(rollup@4.57.0)(typescript@5.9.3)
-      next: 15.5.9(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
 
   '@types/cheerio@0.22.35':
     dependencies:
