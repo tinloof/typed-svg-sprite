@@ -17,11 +17,11 @@
   },
   "scripts": {
     "build": "tsc",
-    "prepare": "npm run build",
+    "prepare": "pnpm run build",
     "clean": "rimraf dist",
     "changeset": "changeset",
     "version": "changeset version",
-    "release": "npm run build && changeset publish"
+    "release": "pnpm run build && changeset publish"
   },
   "files": [
     "dist/",
@@ -47,6 +47,7 @@
     "url": "https://github.com/tinloof/typed-svg-sprite/issues"
   },
   "homepage": "https://github.com/tinloof/typed-svg-sprite#readme",
+  "packageManager": "pnpm@9.15.4",
   "engines": {
     "node": ">=14.0.0"
   },
