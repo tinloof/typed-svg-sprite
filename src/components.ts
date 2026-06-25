@@ -46,7 +46,7 @@ export function generateReactIconComponent(
 
 import type { IconHref } from "${normalizedImportPath}";
 
-export interface IconProps extends React.SVGProps<SVGSVGElement> {
+export interface IconProps extends React.ComponentPropsWithRef<"svg"> {
   /** The icon href (import from generated/icons.ts) */
   href: IconHref;
   /** Size shorthand for width and height */
