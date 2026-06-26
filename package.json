@@ -1,6 +1,6 @@
 {
   "name": "@tinloof/typed-svg-sprite",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Generate optimized SVG sprites with full TypeScript support",
   "bin": {
     "typed-svg-sprite": "./dist/cli.js"
