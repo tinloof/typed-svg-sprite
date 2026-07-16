@@ -13,6 +13,10 @@
     "./astro": {
       "types": "./dist/astro.d.ts",
       "default": "./dist/astro.js"
+    },
+    "./vite": {
+      "types": "./dist/vite.d.ts",
+      "default": "./dist/vite.js"
     }
   },
   "scripts": {
@@ -35,6 +39,7 @@
     "typescript",
     "nextjs",
     "astro",
+    "vite",
     "cli"
   ],
   "author": "LHDi <elhadi98@gmail.com>",
@@ -55,11 +60,17 @@
     "cheerio": "^1.1.2",
     "glob": "^10.3.10"
   },
+  "peerDependencies": {
+    "vite": ">=5.0.0"
+  },
   "peerDependenciesMeta": {
     "next": {
       "optional": true
     },
     "astro": {
+      "optional": true
+    },
+    "vite": {
       "optional": true
     }
   },

@@ -2,7 +2,7 @@
 
 > Generate optimized SVG sprites with full TypeScript support
 
-Automatically generates SVG sprite files with type-safe TypeScript definitions and a ready-to-use React component. Works with Next.js, Astro, or standalone via CLI.
+Automatically generates SVG sprite files with type-safe TypeScript definitions and a ready-to-use React component. Works with Vite, Next.js, Astro, or standalone via CLI.
 
 ## Installation
 
@@ -21,6 +21,31 @@ typed-svg-sprite --input public/icons --output public/sprite.svg
 # Watch mode
 typed-svg-sprite -i public/icons -o public/sprite.svg --watch
 ```
+
+### Vite
+
+```typescript
+// vite.config.ts
+import { defineConfig } from "vite";
+import { svgSprite } from "@tinloof/typed-svg-sprite/vite";
+
+export default defineConfig({
+  plugins: [svgSprite()],
+});
+```
+
+Place SVGs in `public/icons/` and use the generated type-safe hrefs:
+
+```typescript
+import { HOME, SETTINGS } from "./generated/icons";
+
+document.querySelector("#app").innerHTML = `
+  <svg><use href="${HOME}"></use></svg>
+  <svg><use href="${SETTINGS}"></use></svg>
+`;
+```
+
+Vite's resolved `root`, `publicDir`, and `base` settings are respected. During development, adding, changing, or removing an SVG regenerates the sprite and reloads the page.
 
 ### Next.js
 
@@ -82,6 +107,26 @@ Options:
   -w, --watch          Watch for changes and regenerate
   -h, --help           Show help message
 ```
+
+### Vite Configuration
+
+```typescript
+export default defineConfig({
+  plugins: [
+    svgSprite({
+      url?: string; // default: Vite's resolved base
+      filename?: string; // default: "sprite.svg"
+      inputDir?: string; // default: "<publicDir>/icons"
+      outputFile?: string; // default: "<publicDir>/sprite.svg"
+      typesOutputFile?: string; // default: "src/generated/icons.ts"
+      generateIconComponent?: boolean; // default: false
+      iconComponentOutputFile?: string; // default: "src/generated/Icon"
+    }),
+  ],
+});
+```
+
+Relative filesystem paths are resolved from Vite's project root. Set `generateIconComponent: true` in React projects to also generate the typed `Icon.tsx` wrapper.
 
 ### Next.js Configuration
 

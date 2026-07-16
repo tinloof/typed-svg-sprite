@@ -1,0 +1,34 @@
+:root {
+  color: #202124;
+  font-family: system-ui, sans-serif;
+}
+
+body {
+  display: grid;
+  min-height: 100vh;
+  margin: 0;
+  place-items: center;
+}
+
+h1 {
+  text-align: center;
+}
+
+.icons {
+  display: flex;
+  gap: 2rem;
+}
+
+figure {
+  display: grid;
+  gap: 0.5rem;
+  justify-items: center;
+  margin: 0;
+}
+
+svg {
+  width: 3rem;
+  height: 3rem;
+  fill: currentColor;
+}
+
