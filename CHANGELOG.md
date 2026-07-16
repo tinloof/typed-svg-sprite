@@ -1,5 +1,11 @@
 # @tinloof/typed-svg-sprite
 
+## 0.2.0
+
+### Minor Changes
+
+- dbdcdfa: Add a first-class Vite plugin that generates the sprite and typed icon hrefs from Vite's resolved project settings and regenerates them when source icons change in development.
+
 ## 0.1.1
 
 ### Patch Changes
